@@ -21,7 +21,7 @@ imagen_encabezado = Image.open("images/logo.png")
 st.image(imagen_encabezado)
 st.title("🩺 WarningSugar: Predicción Temprana de Diabetes con Big Data")
 # Menú lateral
-opcion_lateral = st.sidebar.selectbox("Navegación", ["Inicio", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado","Predicción"])
+opcion_lateral = st.sidebar.selectbox("Navegación", ["Inicio", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
 
 # Contenido según la opción seleccionada
 #Inicio
@@ -338,63 +338,3 @@ elif opcion_lateral == "Predicción":
     modelo = joblib.load("xgb_model.pkl")
     scaler = joblib.load("scaler.pkl")
     ohe = joblib.load("label_encoder.pkl")
-    '''''
-    # Formulario de entrada
-    st.markdown("### Ingrese los datos del paciente:")
-
-    edad = st.number_input("Edad", min_value=1, max_value=120, value=30)
-    sexo = st.selectbox("Género", ["Male", "Female"])
-    peso = st.number_input("Peso (kg)", min_value=30, max_value=200, value=70)
-    altura = st.number_input("Altura (cm)", min_value=50, max_value=250, value=170)
-    # Calcular BMI
-    bmi = peso / ((altura / 100) ** 2)
-    m_cintura = st.number_input("Medida de la cintura (cm)", min_value=50, max_value=150, value=80)
-    m_glucosa = st.number_input("Nivel de glucosa (mg/dL)", min_value=50, max_value=300, value=100)
-    HbA1c = st.number_input("Nivel de HbA1c (%)", min_value=4.0, max_value=15.0, value=5.5)
-    p_arterial_sistolica = st.number_input("Presión arterial sistólica (mmHg)", min_value=80, max_value=200, value=120)
-    p_arterial_diastolica = st.number_input("Presión arterial diastólica (mmHg)", min_value=50, max_value=150, value=80)
-    colesterol_total = st.number_input("Colesterol total (mg/dL)", min_value=100, max_value=400, value=200)
-    hdl = st.number_input("Colesterol HDL (mg/dL)", min_value=20, max_value=100, value=50)
-    ldl = st.number_input("Colesterol LDL (mg/dL)", min_value=50, max_value=300, value=100)
-    ggt = st.number_input("Gamma-glutamil transferasa (U/L)", min_value=10, max_value=200, value=30)
-    acido_urico = st.number_input("Ácido úrico (mg/dL)", min_value=2.0, max_value=10.0, value=5.0)
-    grado_actividad = st.selectbox("Grado de actividad física", ["Sedentario", "Ligero", "Moderado", "Intenso"])
-    consumo_calorias = st.number_input("Consumo calórico diario (kcal)", min_value=1000, max_value=5000, value=2000)
-    consumo_alcohol = st.selectbox("Consumo de alcohol", ["Nunca", "Ocasional", "Regular", "Excesivo"])
-    fumador = st.selectbox("Estado de fumador", ["Nunca", "Ex-fumador", "Fumador actual"])
-    ante_familiares_diabetes = st.selectbox("Antecedentes familiares de diabetes", ["Sí", "No"])
-    hipertension = st.selectbox("Hipertensión", ["Sí", "No"])
-
-    # Construir dataframe con un solo registro
-    datos_nuevos = pd.DataFrame({
-        "Age": [edad],
-        "Sex": [sexo],
-        "hypertension": [hipertension],
-        "heart_disease": [enfermedad_cardiaca],
-        "ever_married": [estado_casado],
-        "work_type": [tipo_trabajo],
-        "Residence_type": [residencia],
-        "avg_glucose_level": [nivel_glucosa],
-        "bmi": [bmi],
-        "smoking_status": [fumador]
-    })
-
-    # Separar columnas categóricas
-    columnas_cat = ["gender", "ever_married", "work_type", "Residence_type", "smoking_status"]
-    columnas_num = ["age", "hypertension", "heart_disease", "avg_glucose_level", "bmi"]
-
-    # Codificar y escalar
-    datos_cat = ohe.transform(datos_nuevos[columnas_cat])
-    datos_num = scaler.transform(datos_nuevos[columnas_num])
-
-    datos_procesados = np.concatenate([datos_num, datos_cat], axis=1)
-
-    # Hacer predicción
-    prediccion = modelo.predict(datos_procesados)
-    probabilidad = modelo.predict_proba(datos_procesados)[0][1]
-
-    if prediccion[0] == 1:
-        st.error(f"🔴 Alto riesgo de diabetes. Probabilidad: {probabilidad:.2f}")
-    else:
-        st.success(f"🟢 Bajo riesgo de diabetes. Probabilidad: {probabilidad:.2f}")
-'''
