@@ -1,4 +1,3 @@
-
 from click import option
 from openpyxl import load_workbook
 import streamlit as st
@@ -562,3 +561,5 @@ elif opcion_lateral == "Modelado":
 
     else:
         st.warning("⚠️ Primero debes cargar los datos en la sección 'Carga de Datos'.")
+    scaler = joblib.load("scaler.pkl")
+    ohe = joblib.load("label_encoder.pkl")

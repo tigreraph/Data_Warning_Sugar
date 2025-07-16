@@ -7,5 +7,6 @@ missingno
 joblib
 xgboost
 scikit-learn
-pillow
+Pillow
+openpyxl
 click
