@@ -1,4 +1,5 @@
 from click import option
+from openpyxl import load_workbook
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -11,8 +12,10 @@ import xgboost as xgb
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, precision_score
+from sklearn.metrics import confusion_matrix
 from PIL import Image
+import os
 
 
 
@@ -21,11 +24,229 @@ imagen_encabezado = Image.open("images/logo.png")
 st.image(imagen_encabezado)
 st.title("🩺 WarningSugar: Predicción Temprana de Diabetes con Big Data")
 # Menú lateral
-opcion_lateral = st.sidebar.selectbox("Navegación", ["Inicio", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
-
+opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
+#Formulario 
 # Contenido según la opción seleccionada
-#Inicio
-if opcion_lateral == "Inicio":
+if opcion_lateral == "Formulario":
+    if "step" not in st.session_state:
+        st.session_state.step = 0
+    if "form_data" not in st.session_state:
+        st.session_state.form_data = {}
+
+    def next_step():
+        if st.session_state.step < total_pasos - 1:
+            st.session_state.step += 1
+
+    def prev_step():
+        if isinstance(st.session_state.step, int) and st.session_state.step > 0:
+            st.session_state.step -= 1
+
+    # Estilo visual
+    st.markdown("""
+        <style>
+        button[kind="secondary"] {
+            background-color: #002D72;
+            color: white;
+            border-radius: 25px;
+            padding: 0.75em 1.5em;
+            font-size: 16px;
+            margin: 4px;
+        }
+        button[kind="secondary"]:hover {
+            background-color: #0052CC;
+            color: white;
+        }
+        .pregunta-formulario {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    preguntas = [
+        ("Age", "number", {"label": "¿Cuál es tu edad?", "min_value": 0, "max_value": 120}, "images/edad.png"),
+        ("Sex", "select", {"label": "¿Cuál es tu género?", "options": ["Masculino", "Femenino"]}, "images/sexo.png"),
+        ("Ethnicity", "select", {"label": "¿Cuál es tu etnia?", "options": ["Caucásico", "Asiático", "Hispano", "Afrodescendiente"]}, "images/etnia.png"),
+        ("PesoAltura", "peso_altura", {"label": "Ingresa tu peso y altura para calcular el IMC"}, "images/imc.png"),
+        ("Waist_Circumference", "number", {"label": "¿Tu cintura (cm)?", "min_value": 0.0, "format": "%.2f"}, "images/cintura.png"),
+        ("Blood_Pressure_Systolic", "number", {"label": "¿Presión sistólica (mmHg)?", "min_value": 0.0, "format": "%.2f"}, "images/pas.png"),
+        ("Blood_Pressure_Diastolic", "number", {"label": "¿Presión diastólica (mmHg)?", "min_value": 0.0, "format": "%.2f"}, "images/pad.png"),
+        ("Physical_Activity_Level", "select", {"label": "¿Nivel de actividad física?", "options": ["Baja", "Moderada", "Alta"]}, "images/actividad.png"),
+        ("Alcohol_Consumption", "select", {"label": "¿Con qué frecuencia consumes alcohol?", "options": ["Moderado", "Alto"]}, "images/alcohol.png"),
+        ("Smoking_Status", "select", {"label": "¿Con qué frecuencia fumas?", "options": ["No fumo", "Exfumador", "Fumador"]}, "images/fumar.png"),
+        ("Family_History_of_Diabetes", "select", {"label": "¿Antecedentes familiares de diabetes?", "options": ["Sí", "No"]}, "images/familia.png"),
+        ("Previous_Gestational_Diabetes", "select", {"label": "¿Tuviste diabetes gestacional?", "options": ["Sí", "No"]}, "images/gestacional.png")
+    ]
+
+    total_pasos = len(preguntas)
+
+    # 🔁 TRADUCIR RESPUESTAS AL INGLÉS PARA EL MODELO
+    def traducir_datos(form_data):
+        mapeos = {
+            "Sex": {"Masculino": "Male", "Femenino": "Female"},
+            "Ethnicity": {
+                "Caucásico": "White",
+                "Asiático": "Asian",
+                "Hispano": "Hispanic",
+                "Afrodescendiente": "Black",
+            },
+            "Physical_Activity_Level": {"Baja": "Low", "Moderada": "Moderate", "Alta": "High"},
+            "Alcohol_Consumption": {"Moderado": "Moderate", "Alto": "Heavy"},
+            "Smoking_Status": {"No fumo": "Never", "Exfumador": "Former", "Fumador": "Current"},
+            "Family_History_of_Diabetes": {"Sí": "1", "No": "0"},
+            "Previous_Gestational_Diabetes": {"Sí": "1", "No": "0"}
+        }
+        traducido = form_data.copy()
+        for clave, mapeo in mapeos.items():
+            if clave in traducido:
+                traducido[clave] = mapeo.get(traducido[clave], traducido[clave])
+        return traducido
+
+    # ✅ MOSTRAR RESUMEN SI YA FINALIZÓ
+    if st.session_state.step == "resumen":
+        st.markdown("## 🧾 Resumen de tus respuestas:")
+        datos = st.session_state.form_data
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"#### 🧍 Edad: `{datos.get('Age', '-')}` años")
+            st.markdown(f"#### 🧬 Género: `{datos.get('Sex', '-')}`")
+            st.markdown(f"#### 🌍 Etnia: `{datos.get('Ethnicity', '-')}`")
+            st.markdown(f"#### ⚖️ Peso: `{datos.get('Peso', '-')}` kg")
+            st.markdown(f"#### 📏 Altura: `{datos.get('Altura', '-')}` cm")
+            st.markdown(f"#### 📉 IMC: `{datos.get('BMI', '-')}`")
+
+        with col2:
+            st.markdown(f"#### 📐 Circunferencia cintura: `{datos.get('Waist_Circumference', '-')}` cm")
+            st.markdown(f"#### ❤️ PAS: `{datos.get('Blood_Pressure_Systolic', '-')}` mmHg")
+            st.markdown(f"#### ❤️ PAD: `{datos.get('Blood_Pressure_Diastolic', '-')}` mmHg")
+            st.markdown(f"#### 🏃 Actividad física: `{datos.get('Physical_Activity_Level', '-')}`")
+            st.markdown(f"#### 🍷 Alcohol: `{datos.get('Alcohol_Consumption', '-')}`")
+            st.markdown(f"#### 🚬 Fuma: `{datos.get('Smoking_Status', '-')}`")
+            st.markdown(f"#### 👪 Antecedentes familiares: `{datos.get('Family_History_of_Diabetes', '-')}`")
+            st.markdown(f"#### 🤰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
+
+        if st.button("🔍 Predecir riesgo de diabetes"):
+
+            modelo = joblib.load('rf_model.pkl')
+            scaler = joblib.load("scaler.pkl")
+            label_encoders = joblib.load('label_encoders.pkl')
+            categorical_cols = joblib.load("categorical_cols.pkl")
+            columnas_modelo = joblib.load('columnas_modelo.pkl')
+
+            # Traducción de respuestas al inglés
+            datos_modelo = traducir_datos(st.session_state.form_data)
+            # Convertir a DataFrame de 1 fila
+            X_nuevo = pd.DataFrame([datos_modelo])
+            # agrupamiento por rango de edad
+            for col in categorical_cols:
+                if col in X_nuevo:
+                    le = label_encoders[col]
+                    X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
+            # Ordenar columnas para que coincidan con entrenamiento
+            orden_columnas = columnas_modelo
+            X_nuevo = X_nuevo[orden_columnas]
+            # Escalar
+            X_nuevo_scaled = scaler.transform(X_nuevo)
+
+            # prediccion
+            prediccion = modelo.predict(X_nuevo_scaled)[0]
+            proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
+            # Verifica que el modelo se cargó correctamente
+            # Mostrar resultado
+            # Predecir
+            st.write("¿Tiene diabetes?", "Sí" if prediccion == 1 else "No")
+            st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
+        st.stop()
+
+    # Continuar con preguntas paso a paso
+    paso = st.session_state.step
+    clave, tipo, kwargs, ruta_imagen = preguntas[paso]
+
+    # Barra tipo wizard
+    barra = ""
+    for i in range(total_pasos):
+        color = "#0047AB" if i == paso else "#ccc"
+        texto = f"<span style='background:{color};color:white;border-radius:50%;padding:6px 12px;margin:3px'>{i+1}</span>"
+        barra += texto
+    st.markdown(f"<div style='text-align:center;font-size:20px'>{barra}</div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+
+    col_txt, col_img = st.columns([2, 1])
+    with col_txt:
+        st.markdown(f"<div class='pregunta-formulario'>{kwargs['label']}</div>", unsafe_allow_html=True)
+
+        if tipo == "number":
+            with st.form(key=f"form_{clave}"):
+                valor_actual = st.session_state.form_data.get(clave, kwargs.get("min_value", 0))
+                respuesta = st.number_input(label="", value=valor_actual, **{k: v for k, v in kwargs.items() if k not in ["label", "value"]})
+
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    btn_prev = st.form_submit_button("⬅️ Anterior")
+                with col2:
+                    if paso < total_pasos - 1:
+                        btn_next = st.form_submit_button("Siguiente ➡️")
+                    else:
+                        btn_next = st.form_submit_button("✅ Finalizar")
+
+                if btn_prev and paso > 0:
+                    st.session_state.form_data[clave] = respuesta
+                    prev_step()
+                    st.rerun()
+
+                if btn_next:
+                    st.session_state.form_data[clave] = respuesta
+                    if paso < total_pasos - 1:
+                        next_step()
+                    else:
+                        st.session_state.step = "resumen"
+                    st.rerun()
+
+        elif tipo == "select":
+            opciones = kwargs["options"]
+            cols = st.columns(3)
+            for i, opcion in enumerate(opciones):
+                with cols[i % 3]:
+                    if st.button(opcion, key=f"{clave}_{i}"):
+                        st.session_state.form_data[clave] = opcion
+                        if paso < total_pasos - 1:
+                            next_step()
+                            st.rerun()
+                        else:
+                            st.session_state.step = "resumen"
+                            st.rerun()
+
+        elif tipo == "peso_altura":
+            with st.form(key="form_peso_altura"):
+                peso = st.number_input("⚖️ Peso (kg)", min_value=0.0, format="%.2f")
+                altura = st.number_input("📏 Altura (cm)", min_value=0.0, format="%.2f")
+                btn_next = st.form_submit_button("Siguiente ➡️")
+
+                if btn_next:
+                    if peso > 0 and altura > 0:
+                        altura_m = altura / 100
+                        imc = peso / (altura_m ** 2)
+                        st.session_state.form_data["Peso"] = peso
+                        st.session_state.form_data["Altura"] = altura
+                        st.session_state.form_data["BMI"] = round(imc, 2)
+                        next_step()
+                        st.rerun()
+                    else:
+                        st.warning("Completa peso y altura antes de continuar.")
+    with col_img:
+        try:
+            st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
+            st.image(ruta_imagen, width=220)
+            st.markdown("</div>", unsafe_allow_html=True)
+        except:
+            st.info("Imagen no disponible.")
+
+
+
+#Presentación
+if opcion_lateral == "Presentación":
     resumen= "WarningSugar es una solución innovadora que busca prevenir la diabetes en adultos jóvenes de 20 a 25 años, utilizando tecnologías avanzadas de Big Data y Machine Learning. Nuestro proyecto combina análisis de datos clínicos, algoritmos predictivos y visualización interactiva para ofrecer una herramienta accesible y útil tanto para profesionales de la salud como para la población en general."
     st.write(resumen)
     st.header("**Objetivo**")
@@ -288,7 +509,10 @@ elif opcion_lateral == "Modelado":
             data[col] = le.fit_transform(data[col].astype(str))
         # Dividir características y etiqueta
         y = data['Outcome']
-        X = data.drop('Outcome', axis=1)
+        # Eliminar columnas que no son características
+        columns_drops = ['Outcome','Fasting_Blood_Glucose', 'HbA1c', 'Cholesterol_Total', 'Cholesterol_HDL', 'Cholesterol_LDL', 'GGT', 'Serum_Urate', 
+                       'Dietary_Intake_Calories']
+        X = data.drop(columns=columns_drops, axis=1)
 
         # Crear el modelo XGBoost
         model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
@@ -316,25 +540,26 @@ elif opcion_lateral == "Modelado":
         y_test_pred = model.predict(X_test_scaled)
         st.subheader("🧪 Resultados en TEST (10%)")
         st.write(f"Accuracy: {model.score(X_test_scaled, y_test) * 100:.2f}%")
-        st.text(classification_report(y_test, y_test_pred))
-
+        st.text(classification_report(y_test, y_test_pred))      
         # Validación cruzada en todo el dataset escalado
         X_all_scaled = scaler.fit_transform(X)
         acc_scores = cross_val_score(model, X_all_scaled, y, cv=5)
         st.subheader("🔁 Validación Cruzada")
         st.write(f"Accuracy Promedio: {np.mean(acc_scores) * 100:.2f}%")
+        # matriz de confusión
+        
+        st.subheader("📊 Matriz de Confusión")
+        ConfusionMatrixDisplay.from_estimator(model, X_val_scaled, y_val)
+        plt.title("Matriz de Confusión en el set de validación")
+        plt.show()
 
         f1_scores = cross_val_score(model, X_all_scaled, y, cv=5, scoring='f1_macro')
         st.write(f"F1 Macro Score Promedio: {np.mean(f1_scores):.4f}")
         joblib.dump(model, 'xgb_model.pkl')
         joblib.dump(scaler, 'scaler.pkl')
         joblib.dump(le, 'label_encoder.pkl')
+
     else:
         st.warning("⚠️ Primero debes cargar los datos en la sección 'Carga de Datos'.")
-elif opcion_lateral == "Predicción":
-    st.subheader("Predicción de riesgo de diabetes")
-
-    # Cargar modelo y transformadores
-    modelo = joblib.load("xgb_model.pkl")
     scaler = joblib.load("scaler.pkl")
     ohe = joblib.load("label_encoder.pkl")
