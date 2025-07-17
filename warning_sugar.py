@@ -158,7 +158,7 @@ if opcion_lateral == "Formulario":
             # Verifica que el modelo se cargó correctamente
             # Mostrar resultado
             # Predecir
-            st.write("¿Tiene diabetes?", "Sí" if prediccion == 1 else "No")
+            #st.write("¿Tiene diabetes?", "Sí" if prediccion == 1 else "No")
             st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
         st.stop()
 
