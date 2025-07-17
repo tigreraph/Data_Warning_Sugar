@@ -219,22 +219,28 @@ if opcion_lateral == "Formulario":
                             st.rerun()
 
         elif tipo == "peso_altura":
-            with st.form(key="form_peso_altura"):
-                peso = st.number_input("⚖️ Peso (kg)", min_value=0.0, format="%.2f")
-                altura = st.number_input("📏 Altura (cm)", min_value=0.0, format="%.2f")
-                btn_next = st.form_submit_button("Siguiente ➡️")
+            # Formulario para peso y altura
+            peso = st.number_input("⚖️ Peso (kg)", min_value=0.0, format="%.2f")
+            altura = st.number_input("📏 Altura (cm)", min_value=0.0, format="%.2f")
 
-                if btn_next:
-                    if peso > 0 and altura > 0:
-                        altura_m = altura / 100
-                        imc = peso / (altura_m ** 2)
-                        st.session_state.form_data["Peso"] = peso
-                        st.session_state.form_data["Altura"] = altura
-                        st.session_state.form_data["BMI"] = round(imc, 2)
-                        next_step()
-                        st.rerun()
-                    else:
-                        st.warning("Completa peso y altura antes de continuar.")
+            # Mostrar el IMC si ambos valores están presentes
+            if peso > 0 and altura > 0:
+                altura_m = altura / 100  # Convertir altura a metros
+                imc = peso / (altura_m ** 2)  # Cálculo del IMC
+                st.markdown(f"### 💡 Tu IMC es: `{imc:.2f}`")  # Mostrar IMC calculado
+
+            btn_next = st.button("Siguiente ➡️")
+
+            if btn_next:
+                if peso > 0 and altura > 0:
+                    st.session_state.form_data["Peso"] = peso
+                    st.session_state.form_data["Altura"] = altura
+                    st.session_state.form_data["BMI"] = round(imc, 2)  # Guardar IMC calculado
+                    next_step()
+                    st.rerun()
+                else:
+                    st.warning("Completa peso y altura antes de continuar.")
+
     with col_img:
         try:
             st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
