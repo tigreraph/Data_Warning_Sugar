@@ -240,7 +240,6 @@ if opcion_lateral == "Formulario":
                     st.rerun()
                 else:
                     st.warning("Completa peso y altura antes de continuar.")
-
     with col_img:
         try:
             st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
@@ -248,8 +247,6 @@ if opcion_lateral == "Formulario":
             st.markdown("</div>", unsafe_allow_html=True)
         except:
             st.info("Imagen no disponible.")
-
-
 
 #Presentación
 if opcion_lateral == "Presentación":
