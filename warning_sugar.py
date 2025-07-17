@@ -19,6 +19,8 @@ import os
 
 
 
+
+
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
 st.image(imagen_encabezado)
