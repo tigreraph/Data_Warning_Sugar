@@ -16,6 +16,8 @@ from sklearn.metrics import classification_report, confusion_matrix, ConfusionMa
 from sklearn.metrics import confusion_matrix
 from PIL import Image
 import os
+import psycopg2
+from psycopg2 import sql
 
 
 
