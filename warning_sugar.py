@@ -114,7 +114,7 @@ def mostrar_categoria_riesgo(probabilidad):
 
     st.markdown(f"""
         <div style="display: flex; justify-content: center; margin-top: 30px;">
-            <div style="background-color:#ecf0f1;border-radius:30px;display:flex;gap:10px;padding:10px 20px;">
+            <div style="background-color:#ecf0f1;border-radius:30px;display:flex;padding:10px;gap:10px;justify-content:space-between;">
                 <div style="background-color:{'#27ae60' if categoria == 'BAJO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'BAJO' else '#888'};font-weight:bold">BAJO<br><span style='font-size:12px'>1–33%</span></div>
                 <div style="background-color:{'#f1c40f' if categoria == 'MEDIO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'MEDIO' else '#888'};font-weight:bold">MEDIO<br><span style='font-size:12px'>34–66%</span></div>
                 <div style="background-color:{'#e74c3c' if categoria == 'ALTO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'ALTO' else '#888'};font-weight:bold">ALTO<br><span style='font-size:12px'>67–100%</span></div>
