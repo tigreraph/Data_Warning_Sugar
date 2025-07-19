@@ -239,11 +239,15 @@ if opcion_lateral == "Formulario":
                 st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
 
                 st.session_state["prediccion_realizada"] = True
+                if st.button("📋 Ver análisis de registros guardados"):
+                    mostrar_registros_guardados()
+                st.stop()
         else:
             st.write(f"Probabilidad de tener diabetes ya calculada.")
-            mostrar_registros_guardados()
-        st.stop()
-
+            if st.button("📋 Ver análisis de registros guardados"):
+                mostrar_registros_guardados()
+            st.stop()
+        
     # Continuar con preguntas paso a paso
     paso = st.session_state.step
     clave, tipo, kwargs, ruta_imagen = preguntas[paso]
