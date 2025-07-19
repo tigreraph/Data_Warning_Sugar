@@ -210,43 +210,38 @@ if opcion_lateral == "Formulario":
             st.markdown(f"#### 👪 Antecedentes familiares: `{datos.get('Family_History_of_Diabetes', '-')}`")
             st.markdown(f"#### 🤰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
 
-        if st.button("🔍 Predecir riesgo de diabetes"):
-            try:
-                guardar_en_base_de_datos(st.session_state.form_data)
-                st.success("\u2705 Datos guardados correctamente en la base de datos PostgreSQL.")
-            except Exception as e:
-                st.error(f"\u274c Error al guardar en la base de datos: {e}")
-            modelo = joblib.load('rf_model.pkl')
-            scaler = joblib.load("scaler.pkl")
-            label_encoders = joblib.load('label_encoders.pkl')
-            categorical_cols = joblib.load("categorical_cols.pkl")
-            columnas_modelo = joblib.load('columnas_modelo.pkl')
+        if "prediccion_realizada" not in st.session_state:
+            if st.button("🔍 Predecir riesgo de diabetes"):
+                try:
+                    guardar_en_base_de_datos(st.session_state.form_data)
+                    st.success("✅ Datos guardados correctamente en la base de datos PostgreSQL.")
+                except Exception as e:
+                    st.error(f"❌ Error al guardar en la base de datos: {e}")
 
-            # Traducción de respuestas al inglés
-            datos_modelo = traducir_datos(st.session_state.form_data)
-            # Convertir a DataFrame de 1 fila
-            X_nuevo = pd.DataFrame([datos_modelo])
-            # agrupamiento por rango de edad
-            for col in categorical_cols:
-                if col in X_nuevo:
-                    le = label_encoders[col]
-                    X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
-            # Ordenar columnas para que coincidan con entrenamiento
-            orden_columnas = columnas_modelo
-            X_nuevo = X_nuevo[orden_columnas]
-            # Escalar
-            X_nuevo_scaled = scaler.transform(X_nuevo)
+                modelo = joblib.load('rf_model.pkl')
+                scaler = joblib.load("scaler.pkl")
+                label_encoders = joblib.load('label_encoders.pkl')
+                categorical_cols = joblib.load("categorical_cols.pkl")
+                columnas_modelo = joblib.load('columnas_modelo.pkl')
 
-            # predicción
-            predicción = modelo.predict(X_nuevo_scaled)[0]
-            proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
-            # Verifica que el modelo se cargó correctamente
-            # Mostrar resultado
-            # Predecir
-            st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
-            # Mostrar botón para ver registros guardados
-            if st.button("📋 Ver registros guardados"):
-                mostrar_registros_guardados()
+                datos_modelo = traducir_datos(st.session_state.form_data)
+                X_nuevo = pd.DataFrame([datos_modelo])
+                for col in categorical_cols:
+                    if col in X_nuevo:
+                        le = label_encoders[col]
+                        X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
+                X_nuevo = X_nuevo[columnas_modelo]
+                X_nuevo_scaled = scaler.transform(X_nuevo)
+
+                prediccion = modelo.predict(X_nuevo_scaled)[0]
+                proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
+
+                st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
+
+                st.session_state["prediccion_realizada"] = True
+        else:
+            st.write(f"Probabilidad de tener diabetes ya calculada.")
+            mostrar_registros_guardados()
         st.stop()
 
     # Continuar con preguntas paso a paso
