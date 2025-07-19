@@ -48,6 +48,23 @@ def crear_tabla_si_no_existe():
     conn.commit()
     conn.close()
 
+if "tabla_creada" not in st.session_state:
+    try:
+        crear_tabla_si_no_existe()
+        st.session_state["tabla_creada"] = True
+    except Exception as e:
+        st.error(f"❌ Error al crear/verificar la tabla: {e}")
+# --- Mostrar registros guardados desde la base de datos ---
+if st.sidebar.button("📋 Ver registros guardados"):
+    try:
+        conn = conectar_db()
+        df = pd.read_sql("SELECT * FROM formulario_respuestas ORDER BY id DESC", conn)
+        st.subheader("📊 Registros guardados en PostgreSQL")
+        st.dataframe(df)
+        conn.close()
+    except Exception as e:
+        st.error(f"❌ Error al cargar registros: {e}")
+
 # --- Guardar datos del formulario en la base de datos ---
 def guardar_en_base_de_datos(form_data):
     conn = conectar_db()
