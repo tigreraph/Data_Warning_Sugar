@@ -168,7 +168,7 @@ if opcion_lateral == "Formulario":
                 traducido[clave] = mapeo.get(traducido[clave], traducido[clave])
         return traducido
 
-    # ✅ MOSTRAR RESUMEN SI YA FINALIZÓ
+    # ✅ Mostrar resumen al final
     if st.session_state.step == "resumen":
         st.markdown("## 🧾 Resumen de tus respuestas:")
         datos = st.session_state.form_data
@@ -219,8 +219,8 @@ if opcion_lateral == "Formulario":
             # Escalar
             X_nuevo_scaled = scaler.transform(X_nuevo)
 
-            # prediccion
-            prediccion = modelo.predict(X_nuevo_scaled)[0]
+            # predicción
+            predicción = modelo.predict(X_nuevo_scaled)[0]
             proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
             # Verifica que el modelo se cargó correctamente
             # Mostrar resultado
