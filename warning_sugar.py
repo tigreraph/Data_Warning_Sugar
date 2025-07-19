@@ -243,7 +243,6 @@ if opcion_lateral == "Formulario":
                     mostrar_registros_guardados()
                 st.stop()
         else:
-            st.write(f"Probabilidad de tener diabetes ya calculada.")
             if st.button("📋 Ver análisis de registros guardados"):
                 mostrar_registros_guardados()
             st.stop()
