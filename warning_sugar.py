@@ -215,7 +215,7 @@ if opcion_lateral == "Formulario":
             if st.button("🔍 Predecir riesgo de diabetes"):
                 try:
                     guardar_en_base_de_datos(st.session_state.form_data)
-                    st.success("✅ Datos guardados correctamente en la base de datos PostgreSQL.")
+                    st.success("✅")
                 except Exception as e:
                     st.error(f"❌ Error al guardar en la base de datos: {e}")
 
