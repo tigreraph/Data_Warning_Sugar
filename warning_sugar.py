@@ -101,25 +101,34 @@ def guardar_en_base_de_datos(form_data):
     )
     conn.commit()
     conn.close()
-def mostrar_categoria_riesgo(probabilidad):
-    categoria = ""
-    color = ""
-    if probabilidad < 0.33:
-        categoria = "Bajo"
-        color = "#28a745"  # verde
-    elif probabilidad < 0.66:
-        categoria = "Medio"
-        color = "#ffc107"  # amarillo
+def mostrar_resultado_categorizado(probabilidad):
+    if probabilidad <= 33:
+        color = "#28a745"  # Verde
+        texto = "BAJO"
+    elif probabilidad <= 66:
+        color = "#ffc107"  # Amarillo
+        texto = "MEDIO"
     else:
-        categoria = "Alto"
-        color = "#dc3545"  # rojo
+        color = "#dc3545"  # Rojo
+        texto = "ALTO"
 
-    st.markdown(f"""
-        <div style='padding: 20px; border-radius: 15px; background-color:{color}; text-align: center;'>
-            <h2 style='color:white;'>Nivel de Riesgo: {categoria.upper()}</h2>
-            <h3 style='color:white;'>Probabilidad de tener diabetes: {probabilidad * 100:.2f}%</h3>
+    st.markdown("""
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <div style="display: flex; border-radius: 40px; overflow: hidden;">
+                <div style="padding: 12px 30px; background-color: #28a745; color: white; font-weight: bold;" {bajo}>BAJO</div>
+                <div style="padding: 12px 30px; background-color: #ffc107; color: black; font-weight: bold;" {medio}>MEDIO</div>
+                <div style="padding: 12px 30px; background-color: #dc3545; color: white; font-weight: bold;" {alto}>ALTO</div>
+            </div>
         </div>
-    """, unsafe_allow_html=True)
+        <div style="text-align: center; margin-top: 15px; font-size: 18px;">
+            <b>Probabilidad de tener diabetes:</b> {prob:.2f}%
+        </div>
+    """.format(
+        bajo="style=\"border: 4px solid white;\"" if texto == "BAJO" else "",
+        medio="style=\"border: 4px solid white;\"" if texto == "MEDIO" else "",
+        alto="style=\"border: 4px solid white;\"" if texto == "ALTO" else "",
+        prob=probabilidad
+    ), unsafe_allow_html=True)
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
