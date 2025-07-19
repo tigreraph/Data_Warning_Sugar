@@ -54,8 +54,8 @@ if "tabla_creada" not in st.session_state:
         st.session_state["tabla_creada"] = True
     except Exception as e:
         st.error(f"❌ Error al crear/verificar la tabla: {e}")
-# --- Mostrar registros guardados desde la base de datos ---
-if st.sidebar.button("📋 Ver registros guardados"):
+# --- Mostrar registros guardados desde la base de datos (después de predicción) ---
+def mostrar_registros_guardados():
     try:
         conn = conectar_db()
         df = pd.read_sql("SELECT * FROM formulario_respuestas ORDER BY id DESC", conn)
@@ -64,6 +64,7 @@ if st.sidebar.button("📋 Ver registros guardados"):
         conn.close()
     except Exception as e:
         st.error(f"❌ Error al cargar registros: {e}")
+
 
 # --- Guardar datos del formulario en la base de datos ---
 def guardar_en_base_de_datos(form_data):
@@ -243,6 +244,9 @@ if opcion_lateral == "Formulario":
             # Mostrar resultado
             # Predecir
             st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
+            # Mostrar botón para ver registros guardados
+            if st.button("📋 Ver registros guardados"):
+                mostrar_registros_guardados()
         st.stop()
 
     # Continuar con preguntas paso a paso
