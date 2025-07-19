@@ -19,9 +19,70 @@ import os
 import psycopg2
 from psycopg2 import sql
 
+# conexion a la base de datos
+def conectar_db():
+    return psycopg2.connect(st.secrets["connections"]["DB_URL"])
+# crear tabla si no existe
+def crear_tabla_si_no_existe():
+    conn = conectar_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS formulario_respuestas (
+            id SERIAL PRIMARY KEY,
+            age INTEGER,
+            sex VARCHAR(50),
+            ethnicity VARCHAR(50),
+            peso FLOAT,
+            altura FLOAT,
+            bmi FLOAT,
+            waist_circumference FLOAT,
+            blood_pressure_systolic FLOAT,
+            blood_pressure_diastolic FLOAT,
+            physical_activity_level VARCHAR(50),
+            alcohol_consumption VARCHAR(50),
+            smoking_status VARCHAR(50),
+            family_history_of_diabetes BOOLEAN,
+            previous_gestational_diabetes BOOLEAN
+        );
+    """)
+    conn.commit()
+    conn.close()
 
+# --- Guardar datos del formulario en la base de datos ---
+def guardar_en_base_de_datos(form_data):
+    conn = conectar_db()
+    cursor = conn.cursor()
 
+    cursor.execute(
+        sql.SQL("""
+            INSERT INTO formulario_respuestas (
+                age, sex, ethnicity, peso, altura, bmi, waist_circumference,
+                blood_pressure_systolic, blood_pressure_diastolic, physical_activity_level,
+                alcohol_consumption, smoking_status, family_history_of_diabetes, previous_gestational_diabetes
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """),
+        (
+            form_data.get("Age"),
+            form_data.get("Sex"),
+            form_data.get("Ethnicity"),
+            form_data.get("Peso"),
+            form_data.get("Altura"),
+            form_data.get("BMI"),
+            form_data.get("Waist_Circumference"),
+            form_data.get("Blood_Pressure_Systolic"),
+            form_data.get("Blood_Pressure_Diastolic"),
+            form_data.get("Physical_Activity_Level"),
+            form_data.get("Alcohol_Consumption"),
+            form_data.get("Smoking_Status"),
+            form_data.get("Family_History_of_Diabetes") in ["Sí", "Yes", "1", True],
+            form_data.get("Previous_Gestational_Diabetes") in ["Sí", "Yes", "1", True]
+        )
+    )
+    conn.commit()
+    conn.close()
 
+# --- Llamar al crear tabla al iniciar la app ---
+crear_tabla_si_no_existe()
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
@@ -132,7 +193,11 @@ if opcion_lateral == "Formulario":
             st.markdown(f"#### 🤰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
 
         if st.button("🔍 Predecir riesgo de diabetes"):
-
+            try:
+                guardar_en_base_de_datos(st.session_state.form_data)
+                st.success("\u2705 Datos guardados correctamente en la base de datos PostgreSQL.")
+            except Exception as e:
+                st.error(f"\u274c Error al guardar en la base de datos: {e}")
             modelo = joblib.load('rf_model.pkl')
             scaler = joblib.load("scaler.pkl")
             label_encoders = joblib.load('label_encoders.pkl')
@@ -160,7 +225,6 @@ if opcion_lateral == "Formulario":
             # Verifica que el modelo se cargó correctamente
             # Mostrar resultado
             # Predecir
-            #st.write("¿Tiene diabetes?", "Sí" if prediccion == 1 else "No")
             st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
         st.stop()
 
