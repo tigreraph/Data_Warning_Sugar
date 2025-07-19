@@ -107,9 +107,10 @@ imagen_encabezado = Image.open("images/logo.png")
 st.image(imagen_encabezado)
 st.title("🩺 WarningSugar: Predicción Temprana de Diabetes con Big Data")
 # Menú lateral
-opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
+##opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
 #Formulario 
 # Contenido según la opción seleccionada
+opcion_lateral = "Formulario"
 if opcion_lateral == "Formulario":
     if "step" not in st.session_state:
         st.session_state.step = 0
