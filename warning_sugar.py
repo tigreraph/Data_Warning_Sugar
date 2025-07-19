@@ -249,6 +249,7 @@ if opcion_lateral == "Formulario":
             st.stop()
         
     # Continuar con preguntas paso a paso
+if isinstance(st.session_state.get("step"), int):
     paso = st.session_state.step
     clave, tipo, kwargs, ruta_imagen = preguntas[paso]
 
