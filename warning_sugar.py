@@ -48,6 +48,7 @@ def crear_tabla_si_no_existe():
     conn.commit()
     conn.close()
 
+
 def asegurar_tabla():
     if "tabla_creada" not in st.session_state:
         try:
@@ -100,7 +101,25 @@ def guardar_en_base_de_datos(form_data):
     )
     conn.commit()
     conn.close()
+def mostrar_categoria_riesgo(probabilidad):
+    categoria = ""
+    color = ""
+    if probabilidad < 0.33:
+        categoria = "Bajo"
+        color = "#28a745"  # verde
+    elif probabilidad < 0.66:
+        categoria = "Medio"
+        color = "#ffc107"  # amarillo
+    else:
+        categoria = "Alto"
+        color = "#dc3545"  # rojo
 
+    st.markdown(f"""
+        <div style='padding: 20px; border-radius: 15px; background-color:{color}; text-align: center;'>
+            <h2 style='color:white;'>Nivel de Riesgo: {categoria.upper()}</h2>
+            <h3 style='color:white;'>Probabilidad de tener diabetes: {probabilidad * 100:.2f}%</h3>
+        </div>
+    """, unsafe_allow_html=True)
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
