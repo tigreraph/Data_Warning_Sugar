@@ -48,13 +48,14 @@ def crear_tabla_si_no_existe():
     conn.commit()
     conn.close()
 
-if "tabla_creada" not in st.session_state:
-    try:
-        crear_tabla_si_no_existe()
-        st.session_state["tabla_creada"] = True
-    except Exception as e:
-        st.error(f"❌ Error al crear/verificar la tabla: {e}")
-# --- Mostrar registros guardados desde la base de datos (después de predicción) ---
+def asegurar_tabla():
+    if "tabla_creada" not in st.session_state:
+        try:
+            crear_tabla_si_no_existe()
+            st.session_state["tabla_creada"] = True
+        except Exception as e:
+            st.error(f"❌ Error al crear/verificar la tabla: {e}")
+# --- Mostrar registros guardados desde la base de datos (después de predicción)
 def mostrar_registros_guardados():
     try:
         conn = conectar_db()
@@ -68,6 +69,7 @@ def mostrar_registros_guardados():
 
 # --- Guardar datos del formulario en la base de datos ---
 def guardar_en_base_de_datos(form_data):
+    asegurar_tabla()
     conn = conectar_db()
     cursor = conn.cursor()
 
@@ -99,8 +101,6 @@ def guardar_en_base_de_datos(form_data):
     conn.commit()
     conn.close()
 
-# --- Llamar al crear tabla al iniciar la app ---
-crear_tabla_si_no_existe()
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
