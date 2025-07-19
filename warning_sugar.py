@@ -105,7 +105,8 @@ def guardar_en_base_de_datos(form_data):
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
 st.image(imagen_encabezado)
-st.title("🩺 WarningSugar: Predicción Temprana de Diabetes con Big Data")
+st.title("🩺 WarningSugar: Predicción Temprana de Diabetes")
+st.title("Big Data")
 # Menú lateral
 ##opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
 #Formulario 
