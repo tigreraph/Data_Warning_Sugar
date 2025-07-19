@@ -101,34 +101,27 @@ def guardar_en_base_de_datos(form_data):
     )
     conn.commit()
     conn.close()
-def mostrar_resultado_categorizado(probabilidad):
+def mostrar_categoria_riesgo(probabilidad):
     if probabilidad <= 33:
-        color = "#28a745"  # Verde
-        texto = "BAJO"
+        categoria = "BAJO"
+        color = "#27ae60"  # verde
     elif probabilidad <= 66:
-        color = "#ffc107"  # Amarillo
-        texto = "MEDIO"
+        categoria = "MEDIO"
+        color = "#f1c40f"  # amarillo
     else:
-        color = "#dc3545"  # Rojo
-        texto = "ALTO"
+        categoria = "ALTO"
+        color = "#e74c3c"  # rojo
 
-    st.markdown("""
-        <div style="display: flex; justify-content: center; margin-top: 20px;">
-            <div style="display: flex; border-radius: 40px; overflow: hidden;">
-                <div style="padding: 12px 30px; background-color: #28a745; color: white; font-weight: bold;" {bajo}>BAJO</div>
-                <div style="padding: 12px 30px; background-color: #ffc107; color: black; font-weight: bold;" {medio}>MEDIO</div>
-                <div style="padding: 12px 30px; background-color: #dc3545; color: white; font-weight: bold;" {alto}>ALTO</div>
+    st.markdown(f"""
+        <div style="display: flex; justify-content: center; margin-top: 30px;">
+            <div style="background-color:#ecf0f1;border-radius:30px;display:flex;gap:10px;padding:10px 20px;">
+                <div style="background-color:{'#27ae60' if categoria == 'BAJO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'BAJO' else '#888'};font-weight:bold">BAJO<br><span style='font-size:12px'>1–33%</span></div>
+                <div style="background-color:{'#f1c40f' if categoria == 'MEDIO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'MEDIO' else '#888'};font-weight:bold">MEDIO<br><span style='font-size:12px'>34–66%</span></div>
+                <div style="background-color:{'#e74c3c' if categoria == 'ALTO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'ALTO' else '#888'};font-weight:bold">ALTO<br><span style='font-size:12px'>67–100%</span></div>
             </div>
         </div>
-        <div style="text-align: center; margin-top: 15px; font-size: 18px;">
-            <b>Probabilidad de tener diabetes:</b> {prob:.2f}%
-        </div>
-    """.format(
-        bajo="style=\"border: 4px solid white;\"" if texto == "BAJO" else "",
-        medio="style=\"border: 4px solid white;\"" if texto == "MEDIO" else "",
-        alto="style=\"border: 4px solid white;\"" if texto == "ALTO" else "",
-        prob=probabilidad
-    ), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
