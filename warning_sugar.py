@@ -242,7 +242,6 @@ if opcion_lateral == "Formulario":
             if st.button("🔍 Predecir riesgo de diabetes"):
                 try:
                     guardar_en_base_de_datos(st.session_state.form_data)
-                    st.success("✅")
                 except Exception as e:
                     st.error(f"❌ Error al guardar en la base de datos: {e}")
 
@@ -264,14 +263,10 @@ if opcion_lateral == "Formulario":
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
                 mostrar_categoria_riesgo(proba)
-                ##st.session_state["prediccion_realizada"] = True
+                st.session_state["prediccion_realizada"] = True
                 if st.button("📋 Ver análisis de registros guardados"):
                     mostrar_registros_guardados()
-                st.stop()
-        else:
-            if st.button("📋 Ver análisis de registros guardados"):
-                mostrar_registros_guardados()
-            st.stop()
+    st.stop()
         
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
