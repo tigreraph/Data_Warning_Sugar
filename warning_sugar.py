@@ -56,13 +56,62 @@ def asegurar_tabla():
             st.session_state["tabla_creada"] = True
         except Exception as e:
             st.error(f"❌ Error al crear/verificar la tabla: {e}")
-# --- Mostrar registros guardados desde la base de datos (después de predicción)
+# Mostrar registros guardados desde la base de datos (después de predicción)
 def mostrar_registros_guardados():
     try:
         conn = conectar_db()
         df = pd.read_sql("SELECT * FROM formulario_respuestas ORDER BY id DESC", conn)
-        st.subheader("📊 Registros guardados en PostgreSQL")
-        st.dataframe(df)
+        st.subheader("📌 Vista previa de los datos")
+        columns_drops = ["peso", "altura"]  # Columnas que no queremos mostrar
+        df= df.drop(columns=columns_drops)  # Eliminar columnas no relevantes
+        st.dataframe(df.head(10))  # Mostrar solo las primeras 10 filas
+        st.subheader("🔍 Información del DataFrame")
+        st.write("Número de filas:", df.shape[0])
+        st.write("Número de columnas:", df.shape[1])
+        st.write("Encabezados", df.columns)
+        st.write("Tipos de datos", df.dtypes)
+        st.write("Estadisticas Generales", df.describe())
+        st.subheader("Agrupando por rangos de edad")
+        bins = [0, 19, 29, 39, 49, 59, 69, 79, float('inf')]
+        labels = ['-20', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80+']
+        df['Age Group'] = pd.cut(df['age'], bins=bins, labels=labels, right=True)
+        numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+        categorical_cols = df.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.lineplot(x='age_group', y='outcome', data=age_group_diabetes, marker='o', ax=ax)
+        ax.set_title('Diabetes Rate by Age Group')
+        ax.set_xlabel('Age Group')
+        ax.set_ylabel('Proportion with Diabetes')
+        ax.set_ylim(0, 1)
+        ax.grid(True)
+        st.pyplot(fig)
+        # Casos de Diabetes
+        st.subheader("📊 Clase Objetivo ")
+        fig, ax = plt.subplots()
+        sns.countplot(x='outcome', data=df, ax=ax)
+        ax.set_title("Distribución de la Clase Objetivo (Outcome)")
+        ax.set_xlabel("Outcome (0 = No Diabetes, 1 = Diabetes)")
+        ax.set_ylabel("Frecuencia")
+        ax.grid(True)
+        st.pyplot(fig)
+        # Relacion entre BMi y Outcome
+        st.subheader("📊 Relación entre BMI y Outcome")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.boxplot(x='outcome', y='bmi', data=df, palette='Set2', ax=ax)
+        ax.set_title('Relación entre BMI y Diabetes')
+        ax.set_xlabel('Diabetes (0 = No, 1 = Sí)')
+        ax.set_ylabel('BMI')
+        ax.grid(True)
+        st.pyplot(fig)
+        # Relacion entre Edad y Outcome
+        st.subheader("📊 Relación entre Edad y Outcome")
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.boxplot(x='outcome', y='age', data=df, palette='Set2', ax=ax)
+        ax.set_title('Relación entre Edad y Diabetes')
+        ax.set_xlabel('Diabetes (0 = No, 1 = Sí)')
+        ax.set_ylabel('Edad')
+        ax.grid(True)
+        st.pyplot(fig)
         conn.close()
     except Exception as e:
         st.error(f"❌ Error al cargar registros: {e}")
