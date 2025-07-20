@@ -137,7 +137,6 @@ def mostrar_recomendacion_riesgo(proba):
     else:
         st.error("Tienes un **nivel de riesgo alto**. Es muy importante que consultes con un profesional de la salud lo antes posible. Cambios urgentes en tu estilo de vida, como alimentación saludable, ejercicio y control médico son fundamentales.")
 
-
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
 st.image(imagen_encabezado)
@@ -273,8 +272,9 @@ if opcion_lateral == "Formulario":
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
                 mostrar_categoria_riesgo(proba)
-                st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
                 mostrar_recomendacion_riesgo(proba)
+                st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
+
                 st.session_state["prediccion_realizada"] = True
                 if st.button("📋 Ver análisis de registros guardados"):
                     mostrar_registros_guardados()
