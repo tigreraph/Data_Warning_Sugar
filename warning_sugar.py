@@ -68,23 +68,30 @@ def mostrar_registros_guardados():
         st.subheader("🔍 Información del DataFrame")
         st.write("Número de filas:", df.shape[0])
         st.write("Número de columnas:", df.shape[1])
+        # Mostrar encabezados y tipos de datos
         st.subheader("Encabezados")
         st.write(df.columns)
+        # Mostrar tipos de datos y estadísticas generales
         st.subheader("Tipos de datos")
         st.write(df.dtypes)
         st.subheader("Estadisticas Generales")
         st.write(df.describe())
+        # Visualización de datos
         st.subheader("Agrupando por rangos de edad")
         bins = [0, 19, 29, 39, 49, 59, 69, 79, float('inf')]
         labels = ['-20', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80+']
         df['age Group'] = pd.cut(df['age'], bins=bins, labels=labels, right=True)
         numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
         categorical_cols = df.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
+
+        # Agrupar por rango de edad y calcular proporción de diabetes
+        age_group_diabetes = df.groupby('age Group')['outcome'].mean().reset_index()
+        # Graficar
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.lineplot(x='age Group', y='outcome', data=age_group_diabetes, marker='o', ax=ax)
         ax.set_title('Diabetes Rate by Age Group')
         ax.set_xlabel('Age Group')
-        ax.set_ylabel('Proportion with Diabetes')
+        ax.set_ylabel('Proporción con Diabetes')
         ax.set_ylim(0, 1)
         ax.grid(True)
         st.pyplot(fig)
