@@ -306,8 +306,8 @@ if opcion_lateral == "Formulario":
                 # Calcular la probabilidad de diabetes
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
                 try:
-                    # 👇 Aquí corriges el llamado pasándole el outcome como segundo argumento
-                    guardar_en_base_de_datos(st.session_state.form_data, int(prediccion))
+                    ## guardar en la base de datos el formulario y la predicción
+                    guardar_en_base_de_datos(traducir_datos(datos_modelo), int(prediccion))
                 except Exception as e:
                     st.error(f"❌ Error al guardar en la base de datos: {e}")
                 # Mostrar resultados
