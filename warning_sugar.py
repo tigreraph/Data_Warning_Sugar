@@ -261,7 +261,7 @@ if opcion_lateral == "Formulario":
 
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
-
+                st.write(proba)
                 st.write(f"Probabilidad de tener diabetes: {proba * 100:.2f}%")
                 mostrar_categoria_riesgo(proba)
                 st.session_state["prediccion_realizada"] = True
