@@ -104,20 +104,23 @@ def guardar_en_base_de_datos(form_data):
 def mostrar_categoria_riesgo(probabilidad):
     if probabilidad <= 33:
         categoria = "BAJO"
-        color = "#27ae60"  # verde
     elif probabilidad <= 66:
         categoria = "MEDIO"
-        color = "#f1c40f"  # amarillo
     else:
         categoria = "ALTO"
-        color = "#e74c3c"  # rojo
 
     st.markdown(f"""
-        <div style="display: flex; justify-content: center; margin-top: 30px;">
-            <div style="background-color:#ecf0f1;border-radius:30px;display:flex;padding:10px;gap:10px;justify-content:space-between;">
-                <div style="background-color:{'#27ae60' if categoria == 'BAJO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'BAJO' else '#888'};font-weight:bold">BAJO<br><span style='font-size:12px'>1–33%</span></div>
-                <div style="background-color:{'#f1c40f' if categoria == 'MEDIO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'MEDIO' else '#888'};font-weight:bold">MEDIO<br><span style='font-size:12px'>34–66%</span></div>
-                <div style="background-color:{'#e74c3c' if categoria == 'ALTO' else '#ecf0f1'};padding:10px 20px;border-radius:25px;color:{'white' if categoria == 'ALTO' else '#888'};font-weight:bold">ALTO<br><span style='font-size:12px'>67–100%</span></div>
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+            <div style="background-color:#ecf0f1;border-radius:30px;display:flex;padding:10px;gap:10px;justify-content:space-between;max-width:700px;width:100%">
+                <div style="flex: 1; text-align:center; background-color:{'#27ae60' if categoria == 'BAJO' else '#ecf0f1'};padding:10px 0;border-radius:25px;color:{'white' if categoria == 'BAJO' else '#888'};font-weight:bold">
+                    BAJO<br><span style='font-size:12px'>1–33%</span>
+                </div>
+                <div style="flex: 1; text-align:center; background-color:{'#f1c40f' if categoria == 'MEDIO' else '#ecf0f1'};padding:10px 0;border-radius:25px;color:{'white' if categoria == 'MEDIO' else '#888'};font-weight:bold">
+                    MEDIO<br><span style='font-size:12px'>34–66%</span>
+                </div>
+                <div style="flex: 1; text-align:center; background-color:{'#e74c3c' if categoria == 'ALTO' else '#ecf0f1'};padding:10px 0;border-radius:25px;color:{'white' if categoria == 'ALTO' else '#888'};font-weight:bold">
+                    ALTO<br><span style='font-size:12px'>67–100%</span>
+                </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
