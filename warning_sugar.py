@@ -126,16 +126,7 @@ def mostrar_categoria_riesgo(aux):
             </div>
         </div>
     """, unsafe_allow_html=True)
-def mostrar_recomendacion_riesgo(proba):
-    porcentaje = proba * 100
-    st.markdown("## ¿Qué hacer ahora?")
 
-    if porcentaje < 34:
-        st.success("Tienes un **nivel de riesgo bajo**. ¡Excelente! Sigue manteniendo un estilo de vida saludable con actividad física regular, alimentación balanceada y chequeos médicos periódicos.")
-    elif porcentaje < 67:
-        st.warning("Tienes un **nivel de riesgo moderado**. Aunque no es preocupante, es un buen momento para hacer pequeños cambios: mejorar tu alimentación, reducir el consumo de alcohol, dejar de fumar o aumentar tu actividad física.")
-    else:
-        st.error("Tienes un **nivel de riesgo alto**. Es muy importante que consultes con un profesional de la salud lo antes posible. Cambios urgentes en tu estilo de vida, como alimentación saludable, ejercicio y control médico son fundamentales.")
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
@@ -272,9 +263,7 @@ if opcion_lateral == "Formulario":
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
                 mostrar_categoria_riesgo(proba)
-                mostrar_recomendacion_riesgo(proba)
                 st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
-
                 st.session_state["prediccion_realizada"] = True
                 if st.button("📋 Ver análisis de registros guardados"):
                     mostrar_registros_guardados()
