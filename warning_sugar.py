@@ -164,7 +164,7 @@ def mostrar_factores_modificables(datos):
         st.markdown("- Considera reducir el consumo de sal, manejar el estrés y hacer actividad física regularmente.")
 
     if cintura < 90 and imc < 25 and pas < 130 and pad < 85:
-        st.success("🎉 ¡Excelente! Tus factores modificables están dentro de los rangos saludables.")
+        st.success("🎉 ¡Excelente! Eres una persona saludable.")
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
