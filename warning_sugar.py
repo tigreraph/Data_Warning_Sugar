@@ -42,7 +42,8 @@ def crear_tabla_si_no_existe():
             alcohol_consumption VARCHAR(50),
             smoking_status VARCHAR(50),
             family_history_of_diabetes BOOLEAN,
-            previous_gestational_diabetes BOOLEAN
+            previous_gestational_diabetes BOOLEAN,
+            outcome INTEGER
         );
     """)
     conn.commit()
@@ -78,8 +79,9 @@ def guardar_en_base_de_datos(form_data):
             INSERT INTO formulario_respuestas (
                 age, sex, ethnicity, peso, altura, bmi, waist_circumference,
                 blood_pressure_systolic, blood_pressure_diastolic, physical_activity_level,
-                alcohol_consumption, smoking_status, family_history_of_diabetes, previous_gestational_diabetes
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                alcohol_consumption, smoking_status, family_history_of_diabetes, previous_gestational_diabetes,
+                outcome
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """),
         (
             form_data.get("Age"),
@@ -95,7 +97,8 @@ def guardar_en_base_de_datos(form_data):
             form_data.get("Alcohol_Consumption"),
             form_data.get("Smoking_Status"),
             form_data.get("Family_History_of_Diabetes") in ["Sí", "Yes", "1", True],
-            form_data.get("Previous_Gestational_Diabetes") in ["Sí", "Yes", "1", True]
+            form_data.get("Previous_Gestational_Diabetes") in ["Sí", "Yes", "1", True],
+            outcome
         )
     )
     conn.commit()
@@ -277,37 +280,42 @@ if opcion_lateral == "Formulario":
             st.markdown(f"#### 👪 Antecedentes familiares: `{datos.get('Family_History_of_Diabetes', '-')}`")
             st.markdown(f"#### 🤰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
 
-        # PREDICCIÓN
-        # Fragmento modificado
+        
+        # Boton predicción
         if "prediccion_realizada" not in st.session_state:
             if st.button("🔍 Predecir riesgo de diabetes"):
                 try:
                     guardar_en_base_de_datos(st.session_state.form_data)
                 except Exception as e:
                     st.error(f"❌ Error al guardar en la base de datos: {e}")
-
+                # cargar modelo y codificadores
                 modelo = joblib.load('rf_model.pkl')
                 scaler = joblib.load("scaler.pkl")
                 label_encoders = joblib.load('label_encoders.pkl')
                 categorical_cols = joblib.load("categorical_cols.pkl")
                 columnas_modelo = joblib.load('columnas_modelo.pkl')
-
+                # Traducir datos del formulario
                 datos_modelo = traducir_datos(st.session_state.form_data)
                 X_nuevo = pd.DataFrame([datos_modelo])
                 for col in categorical_cols:
                     if col in X_nuevo:
                         le = label_encoders[col]
                         X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
+                # Asegurar que las columnas coincidan con el modelo
                 X_nuevo = X_nuevo[columnas_modelo]
+                # Escalar los datos
                 X_nuevo_scaled = scaler.transform(X_nuevo)
-
+                # Realizar la predicción
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
+                # Calcular la probabilidad de diabetes
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
-
+                guardar_en_base_de_datos(st.session_state.form_data, int(prediccion))
+                # Mostrar resultados
                 mostrar_categoria_riesgo(proba)
                 st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
                 mostrar_recomendacion_riesgo(proba)
                 mostrar_factores_modificables(st.session_state.form_data)
+                # Guardar la probabilidad en session_state
                 st.session_state["prediccion_realizada"] = True
                 st.session_state["proba"] = proba
         else:
