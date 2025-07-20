@@ -144,6 +144,7 @@ st.title("Big Data")
 # Menú lateral
 ##opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
 #Formulario 
+
 # Contenido según la opción seleccionada
 opcion_lateral = "Formulario"
 if opcion_lateral == "Formulario":
