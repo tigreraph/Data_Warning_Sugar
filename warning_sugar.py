@@ -275,10 +275,9 @@ if opcion_lateral == "Formulario":
                 mostrar_recomendacion_riesgo(proba)
                 st.session_state["prediccion_realizada"] = True
                 st.session_state["proba"] = proba
-
-        if st.session_state.get("prediccion_realizada"):
-            if st.button("📋 Ver análisis de registros guardados"):
-                mostrar_registros_guardados()
+            if st.session_state.get("prediccion_realizada"):
+                if st.button("📋 Ver análisis de registros guardados"):
+                    mostrar_registros_guardados()
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
     paso = st.session_state.step
