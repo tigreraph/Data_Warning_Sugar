@@ -134,6 +134,37 @@ def mostrar_recomendacion_riesgo(proba):
         st.warning("Tienes un **nivel de riesgo moderado**. Aunque no es preocupante, es un buen momento para hacer pequeños cambios: mejorar tu alimentación, reducir el consumo de alcohol, dejar de fumar o aumentar tu actividad física.")
     else:
         st.error("Tienes un **nivel de riesgo alto**. Es muy importante que consultes con un profesional de la salud lo antes posible. Cambios urgentes en tu estilo de vida, como alimentación saludable, ejercicio y control médico son fundamentales.")
+def mostrar_factores_modificables(datos):
+    cintura = datos.get("Waist_Circumference", 0)
+    imc = datos.get("BMI", 0)
+    pas = datos.get("Blood_Pressure_Systolic", 0)
+    pad = datos.get("Blood_Pressure_Diastolic", 0)
+
+    st.markdown("### 🔧 Factores de riesgo que puedes mejorar")
+    st.info("Incluso pequeños cambios pueden ayudarte a reducir tu riesgo. A continuación, te mostramos algunas recomendaciones según tus respuestas:")
+
+    if cintura >= 90:
+        st.warning(f"📏 Circunferencia de cintura: **{cintura} cm**")
+        if cintura < 100:
+            st.markdown("- Estás en un rango ligeramente elevado. Considera bajar tu consumo de grasas y azúcares simples.")
+        elif cintura < 110:
+            st.markdown("- Cintura en rango moderadamente alto. Aumentar la actividad física y cuidar porciones es clave.")
+        else:
+            st.markdown("- Alto riesgo por grasa abdominal. Consulta con nutricionista para plan personalizado.")
+
+    if imc >= 25:
+        st.warning(f"⚖️ IMC: **{imc}**")
+        if imc < 30:
+            st.markdown("- Estás en sobrepeso. Baja de peso entre 5-10% puede reducir mucho tu riesgo.")
+        else:
+            st.markdown("- Obesidad. Acude a control médico y nutricional urgente para prevención.")
+
+    if pas >= 130 or pad >= 85:
+        st.warning(f"❤️ Presión arterial: **{pas}/{pad} mmHg**")
+        st.markdown("- Considera reducir el consumo de sal, manejar el estrés y hacer actividad física regularmente.")
+
+    if cintura < 90 and imc < 25 and pas < 130 and pad < 85:
+        st.success("🎉 ¡Excelente! Tus factores modificables están dentro de los rangos saludables.")
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
@@ -276,7 +307,7 @@ if opcion_lateral == "Formulario":
                 mostrar_categoria_riesgo(proba)
                 st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
                 mostrar_recomendacion_riesgo(proba)
-
+                mostrar_factores_modificables(st.session_state.form_data)
                 st.session_state["prediccion_realizada"] = True
                 st.session_state["proba"] = proba
         else:
@@ -284,13 +315,12 @@ if opcion_lateral == "Formulario":
             mostrar_categoria_riesgo(st.session_state["proba"])
             st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
             mostrar_recomendacion_riesgo(st.session_state["proba"])
+            mostrar_factores_modificables(st.session_state.form_data)
 
         # Mostrar botón SIEMPRE que ya se haya predicho
         if "prediccion_realizada" in st.session_state:
             if st.button("📋 Ver análisis de registros guardados"):
                 mostrar_registros_guardados()
-
-
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
     paso = st.session_state.step
