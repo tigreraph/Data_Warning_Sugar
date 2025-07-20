@@ -69,7 +69,7 @@ def mostrar_registros_guardados():
 
 
 # --- Guardar datos del formulario en la base de datos 
-def guardar_en_base_de_datos(form_data):
+def guardar_en_base_de_datos(form_data,outcome):
     asegurar_tabla()
     conn = conectar_db()
     cursor = conn.cursor()
