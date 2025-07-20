@@ -263,6 +263,7 @@ if opcion_lateral == "Formulario":
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
                 mostrar_categoria_riesgo(proba)
+                st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
                 st.session_state["prediccion_realizada"] = True
                 if st.button("📋 Ver análisis de registros guardados"):
                     mostrar_registros_guardados()
