@@ -129,7 +129,6 @@ def mostrar_categoria_riesgo(aux):
 def mostrar_recomendacion_riesgo(proba):
     porcentaje = proba * 100
     st.markdown("## ¿Qué hacer ahora?")
-
     if porcentaje < 34:
         st.success("Tienes un **nivel de riesgo bajo**. ¡Excelente! Sigue manteniendo un estilo de vida saludable con actividad física regular, alimentación balanceada y chequeos médicos periódicos.")
     elif porcentaje < 67:
