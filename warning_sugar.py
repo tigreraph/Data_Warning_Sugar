@@ -284,10 +284,6 @@ if opcion_lateral == "Formulario":
         # Boton predicción
         if "prediccion_realizada" not in st.session_state:
             if st.button("🔍 Predecir riesgo de diabetes"):
-                try:
-                    guardar_en_base_de_datos(st.session_state.form_data)
-                except Exception as e:
-                    st.error(f"❌ Error al guardar en la base de datos: {e}")
                 # cargar modelo y codificadores
                 modelo = joblib.load('rf_model.pkl')
                 scaler = joblib.load("scaler.pkl")
@@ -309,7 +305,11 @@ if opcion_lateral == "Formulario":
                 prediccion = modelo.predict(X_nuevo_scaled)[0]
                 # Calcular la probabilidad de diabetes
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
-                guardar_en_base_de_datos(st.session_state.form_data, int(prediccion))
+                try:
+                    # 👇 Aquí corriges el llamado pasándole el outcome como segundo argumento
+                    guardar_en_base_de_datos(st.session_state.form_data, int(prediccion))
+                except Exception as e:
+                    st.error(f"❌ Error al guardar en la base de datos: {e}")
                 # Mostrar resultados
                 mostrar_categoria_riesgo(proba)
                 st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
