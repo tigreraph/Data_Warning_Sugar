@@ -277,9 +277,6 @@ if opcion_lateral == "Formulario":
                 st.session_state["proba"] = proba
 
         if st.session_state.get("prediccion_realizada"):
-            mostrar_categoria_riesgo(st.session_state["proba"])
-            st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
-            mostrar_recomendacion_riesgo(st.session_state["proba"])
             if st.button("📋 Ver análisis de registros guardados"):
                 mostrar_registros_guardados()
     # Continuar con preguntas paso a paso
