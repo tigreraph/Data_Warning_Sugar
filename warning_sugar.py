@@ -247,6 +247,7 @@ if opcion_lateral == "Formulario":
             st.markdown(f"#### 🤰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
 
         # PREDICCIÓN
+        # Fragmento modificado
         if "prediccion_realizada" not in st.session_state:
             if st.button("🔍 Predecir riesgo de diabetes"):
                 try:
@@ -269,6 +270,7 @@ if opcion_lateral == "Formulario":
                 X_nuevo = X_nuevo[columnas_modelo]
                 X_nuevo_scaled = scaler.transform(X_nuevo)
 
+                prediccion = modelo.predict(X_nuevo_scaled)[0]
                 proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
 
                 mostrar_categoria_riesgo(proba)
@@ -278,13 +280,16 @@ if opcion_lateral == "Formulario":
                 st.session_state["prediccion_realizada"] = True
                 st.session_state["proba"] = proba
         else:
+            # Mostrar resultado anterior sin volver a ejecutar la predicción
             mostrar_categoria_riesgo(st.session_state["proba"])
             st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
             mostrar_recomendacion_riesgo(st.session_state["proba"])
 
-        # Mostrar registros guardados solo en resumen y post-predicción
-        if st.button("📋 Ver análisis de registros guardados"):
-            mostrar_registros_guardados()
+        # Mostrar botón SIEMPRE que ya se haya predicho
+        if "prediccion_realizada" in st.session_state:
+            if st.button("📋 Ver análisis de registros guardados"):
+                mostrar_registros_guardados()
+
 
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
