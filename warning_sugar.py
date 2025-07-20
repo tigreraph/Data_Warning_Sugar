@@ -222,67 +222,66 @@ if opcion_lateral == "Formulario":
                 traducido[clave] = mapeo.get(traducido[clave], traducido[clave])
         return traducido
 
-    # ✅ Mostrar resumen al final
+ # Mostrar resumen al final
     if st.session_state.step == "resumen":
-    st.markdown("## 🧾 Resumen de tus respuestas:")
-    datos = st.session_state.form_data
+        st.markdown("## 🧾 Resumen de tus respuestas:")
+        datos = st.session_state.form_data
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown(f"#### 🧝 Edad: `{datos.get('Age', '-')}` años")
-        st.markdown(f"#### 🧬 Género: `{datos.get('Sex', '-')}`")
-        st.markdown(f"#### 🌍 Etnia: `{datos.get('Ethnicity', '-')}`")
-        st.markdown(f"#### ⚖️ Peso: `{datos.get('Peso', '-')}` kg")
-        st.markdown(f"#### 📏 Altura: `{datos.get('Altura', '-')}` cm")
-        st.markdown(f"#### 📉 IMC: `{datos.get('BMI', '-')}`")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"#### 🧝 Edad: `{datos.get('Age', '-')}` años")
+            st.markdown(f"#### 🧬 Género: `{datos.get('Sex', '-')}`")
+            st.markdown(f"#### 🌍 Etnia: `{datos.get('Ethnicity', '-')}`")
+            st.markdown(f"#### ⚖️ Peso: `{datos.get('Peso', '-')}` kg")
+            st.markdown(f"#### 📏 Altura: `{datos.get('Altura', '-')}` cm")
+            st.markdown(f"#### 📉 IMC: `{datos.get('BMI', '-')}`")
 
-    with col2:
-        st.markdown(f"#### 📀 Circunferencia cintura: `{datos.get('Waist_Circumference', '-')}` cm")
-        st.markdown(f"#### ❤️ PAS: `{datos.get('Blood_Pressure_Systolic', '-')}` mmHg")
-        st.markdown(f"#### ❤️ PAD: `{datos.get('Blood_Pressure_Diastolic', '-')}` mmHg")
-        st.markdown(f"#### 🏃 Actividad física: `{datos.get('Physical_Activity_Level', '-')}`")
-        st.markdown(f"#### 🍷 Alcohol: `{datos.get('Alcohol_Consumption', '-')}`")
-        st.markdown(f"#### 🚬 Fuma: `{datos.get('Smoking_Status', '-')}`")
-        st.markdown(f"#### 👪 Antecedentes familiares: `{datos.get('Family_History_of_Diabetes', '-')}`")
-        st.markdown(f"#### 🧰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
+        with col2:
+            st.markdown(f"#### 📀 Circunferencia cintura: `{datos.get('Waist_Circumference', '-')}` cm")
+            st.markdown(f"#### ❤️ PAS: `{datos.get('Blood_Pressure_Systolic', '-')}` mmHg")
+            st.markdown(f"#### ❤️ PAD: `{datos.get('Blood_Pressure_Diastolic', '-')}` mmHg")
+            st.markdown(f"#### 🏃 Actividad física: `{datos.get('Physical_Activity_Level', '-')}`")
+            st.markdown(f"#### 🍷 Alcohol: `{datos.get('Alcohol_Consumption', '-')}`")
+            st.markdown(f"#### 🚬 Fuma: `{datos.get('Smoking_Status', '-')}`")
+            st.markdown(f"#### 👪 Antecedentes familiares: `{datos.get('Family_History_of_Diabetes', '-')}`")
+            st.markdown(f"#### 🧰 Diabetes gestacional: `{datos.get('Previous_Gestational_Diabetes', '-')}`")
 
-    if "prediccion_realizada" not in st.session_state:
-        if st.button("🔍 Predecir riesgo de diabetes"):
-            try:
-                guardar_en_base_de_datos(st.session_state.form_data)
-            except Exception as e:
-                st.error(f"❌ Error al guardar en la base de datos: {e}")
+        if "prediccion_realizada" not in st.session_state:
+            if st.button("🔍 Predecir riesgo de diabetes"):
+                try:
+                    guardar_en_base_de_datos(st.session_state.form_data)
+                except Exception as e:
+                    st.error(f"❌ Error al guardar en la base de datos: {e}")
 
-            modelo = joblib.load('rf_model.pkl')
-            scaler = joblib.load("scaler.pkl")
-            label_encoders = joblib.load('label_encoders.pkl')
-            categorical_cols = joblib.load("categorical_cols.pkl")
-            columnas_modelo = joblib.load('columnas_modelo.pkl')
+                modelo = joblib.load('rf_model.pkl')
+                scaler = joblib.load("scaler.pkl")
+                label_encoders = joblib.load('label_encoders.pkl')
+                categorical_cols = joblib.load("categorical_cols.pkl")
+                columnas_modelo = joblib.load('columnas_modelo.pkl')
 
-            datos_modelo = traducir_datos(st.session_state.form_data)
-            X_nuevo = pd.DataFrame([datos_modelo])
-            for col in categorical_cols:
-                if col in X_nuevo:
-                    le = label_encoders[col]
-                    X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
-            X_nuevo = X_nuevo[columnas_modelo]
-            X_nuevo_scaled = scaler.transform(X_nuevo)
+                datos_modelo = traducir_datos(st.session_state.form_data)
+                X_nuevo = pd.DataFrame([datos_modelo])
+                for col in categorical_cols:
+                    if col in X_nuevo:
+                        le = label_encoders[col]
+                        X_nuevo[col] = le.transform(X_nuevo[col].astype(str))
+                X_nuevo = X_nuevo[columnas_modelo]
+                X_nuevo_scaled = scaler.transform(X_nuevo)
 
-            prediccion = modelo.predict(X_nuevo_scaled)[0]
-            proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
-            mostrar_categoria_riesgo(proba)
-            st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
-            mostrar_recomendacion_riesgo(proba)
-            st.session_state["prediccion_realizada"] = True
-            st.session_state["proba"] = proba
+                prediccion = modelo.predict(X_nuevo_scaled)[0]
+                proba = modelo.predict_proba(X_nuevo_scaled)[0][1]
+                mostrar_categoria_riesgo(proba)
+                st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
+                mostrar_recomendacion_riesgo(proba)
+                st.session_state["prediccion_realizada"] = True
+                st.session_state["proba"] = proba
 
-    if st.session_state.get("prediccion_realizada"):
-        mostrar_categoria_riesgo(st.session_state["proba"])
-        st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
-        mostrar_recomendacion_riesgo(st.session_state["proba"])
-        if st.button("📋 Ver análisis de registros guardados"):
-            mostrar_registros_guardados()
-
+        if st.session_state.get("prediccion_realizada"):
+            mostrar_categoria_riesgo(st.session_state["proba"])
+            st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
+            mostrar_recomendacion_riesgo(st.session_state["proba"])
+            if st.button("📋 Ver análisis de registros guardados"):
+                mostrar_registros_guardados()
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
     paso = st.session_state.step
