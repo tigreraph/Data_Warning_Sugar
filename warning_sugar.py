@@ -13,7 +13,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, precision_score
-from sklearn.metrics import confusion_matrix
 from PIL import Image
 import os
 import psycopg2
@@ -277,7 +276,7 @@ if opcion_lateral == "Formulario":
                 st.session_state["prediccion_realizada"] = True
                 if st.button("📋 Ver análisis de registros guardados"):
                     mostrar_registros_guardados()
-    st.stop()
+                st.stop()
         
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
