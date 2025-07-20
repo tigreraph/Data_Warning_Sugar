@@ -101,7 +101,9 @@ def guardar_en_base_de_datos(form_data):
     )
     conn.commit()
     conn.close()
-def mostrar_categoria_riesgo(probabilidad):
+def mostrar_categoria_riesgo(aux):
+    probabilidad = (aux*100)
+    categoria = ""
     if probabilidad <= 33:
         categoria = "BAJO"
     elif probabilidad <= 66:
