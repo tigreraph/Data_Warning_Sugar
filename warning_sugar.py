@@ -48,7 +48,6 @@ def crear_tabla_si_no_existe():
     conn.commit()
     conn.close()
 
-
 def asegurar_tabla():
     if "tabla_creada" not in st.session_state:
         try:
@@ -68,7 +67,7 @@ def mostrar_registros_guardados():
         st.error(f"❌ Error al cargar registros: {e}")
 
 
-# --- Guardar datos del formulario en la base de datos ---
+# --- Guardar datos del formulario en la base de datos 
 def guardar_en_base_de_datos(form_data):
     asegurar_tabla()
     conn = conectar_db()
