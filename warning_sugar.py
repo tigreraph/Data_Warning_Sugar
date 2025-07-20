@@ -19,6 +19,7 @@ import os
 import psycopg2
 from psycopg2 import sql
 
+
 # conexion a la base de datos
 def conectar_db():
     return psycopg2.connect(st.secrets["connections"]["DB_URL"])
