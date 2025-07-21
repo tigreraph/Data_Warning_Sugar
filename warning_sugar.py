@@ -75,9 +75,6 @@ def mostrar_registros_guardados():
         st.write("Número de filas:", df.shape[0])
         st.write("Número de columnas:", df.shape[1])
 
-        st.subheader("Encabezados")
-        st.write(df.columns.tolist())
-
         st.subheader("Tipos de datos")
         st.write(df.dtypes)
 
@@ -561,89 +558,8 @@ if isinstance(st.session_state.get("step"), int):
             st.info("Imagen no disponible.")
 
 #Presentación
-if opcion_lateral == "Presentación":
-    resumen= "WarningSugar es una solución innovadora que busca prevenir la diabetes en adultos jóvenes de 20 a 25 años, utilizando tecnologías avanzadas de Big Data y Machine Learning. Nuestro proyecto combina análisis de datos clínicos, algoritmos predictivos y visualización interactiva para ofrecer una herramienta accesible y útil tanto para profesionales de la salud como para la población en general."
-    st.write(resumen)
-    st.header("**Objetivo**")
-    st.write("*️⃣Prevenir la tendencia a la diabetes en adultos jóvenes en el rango de edad de 20 a 25 años a través del análisis de casos recientes, exámenes de sangre y modelo predictivo para mostrar mediante  una interfaz web los resultados y recomendaciones ")
-    ##st.subheader("Integrantes:")
-    st.header("Descripción del Dataset")
-    descripcion_variables=pd.read_csv('csv/descripcion_variables.csv')
-    st.dataframe(descripcion_variables)
-    st.write("Dataset: https://www.kaggle.com/datasets/marshalpatel3558/diabetes-prediction-dataset")
-    st.markdown("## 👥 Integrantes")
-    integrantes = [
-        {
-            "nombre": "Diego Josue Mendez Peralta",
-            "correo": "diego.mendez.est@tecazuay.edu.ec",
-            "genero": "Masculino",
-            "edad": 19,
-            "aporte": "Analisis de datos"
-        },
-        {
-            "nombre": "Jonnathan Fernando Tigre Bueno",
-            "correo": "jonnathanf.tigre.est@tecazuay.edu.ec",
-            "genero": "Masculino",
-            "edad": 28,
-            "aporte": "Creación de la interfaz web y modelo predictivo"
-        }
-    ]
-    # Distribuir en filas de 3 columnas máximo por fila (puedes ajustar según el diseño)
-    cols = st.columns(len(integrantes))  # una columna por integrante
 
-    for i, integrante in enumerate(integrantes):
-        with cols[i]:
-            st.markdown("----")
-            st.markdown(f"**Nombre:** {integrante['nombre']}")
-            st.markdown(f"**Correo:** {integrante['correo']}")
-            st.markdown(f"**Género:** {integrante['genero']}")
-            st.markdown(f"**Edad:** {integrante['edad']}")
-            st.markdown(f"**Aporte:** {integrante['aporte']}")
-# Carga de Archivos
-elif opcion_lateral == "Carga de Datos":
-    # Título
-    st.title("⌛ Carga de Datos")
-    # Cargar archivo
-    ##archivo = st.file_uploader("📁 Sube el archivo CSV", type=["csv"]) 
-    archivo= ('csv/diabetes_dataset.csv')
-    # proceso de cargar los datos dentro de una condicion 
-    if archivo is not None:
-        # Cargar archivo y guardar la sesion
-        data = pd.read_csv(archivo)
-        data['Outcome'] = ((data['Fasting_Blood_Glucose'] >= 126) | (data['HbA1c'] > 6.5)).astype('int64')
-        st.subheader("📌 Vista previa de los datos")
-        data.drop(columns=['Unnamed: 0'], inplace=True)
-        st.session_state.data = data 
-        # Mostrar los primeros 5 registros
-        st.write(data.head())
-        # Info básica
-        st.subheader("🔍 Información del DataFrame")
-        st.write("Número de filas:", data.shape[0])
-        st.write("Número de columnas:", data.shape[1])
-        st.write("Encabezados", data.columns)
-        st.write("Tipos de datos", data.dtypes)
-        st.write("Estadisticas Generales", data.describe())
-        buffer = io.StringIO()
-        data.info(buf=buffer)
-        info_str = buffer.getvalue()
-        st.write("Informaciion DataFrame:")
-        st.text(info_str)
-        # Verificar valores nulos
-        st.subheader("🧪 Valores nulos")
-        st.write(data.isnull().sum())
-        st.subheader("🧪 Porcentaje de Valores Nulos")
-        st.write(data.isnull().sum()/ len(data)*100)
-        # Verificar valores nulos
-        st.subheader("🧪 Valores Duplicados")
-        st.write(data.duplicated().sum())
-        # verificar valores faltantes
-        st.subheader("🧪 Valores Incompletos")
-        st.write(data.isnull().any())
-        # Verficar los valores unicos 
-        st.subheader("🧪 Valores Unicos")
-        st.write(data.apply(lambda x: len(x.unique())))
-    else:
-        st.info("⬆️ Por favor, sube un archivo CSV para comenzar.")
+
 elif opcion_lateral == "Pre procesamiento":
     st.title("🔄 Pre Procesamiento de Datos")
 
@@ -805,69 +721,3 @@ elif opcion_lateral == "Visualizacion":
         st.pyplot(fig)
         data = st.session_state.data
         st.session_state.categorical_cols = data.select_dtypes(include=['object', 'category']).columns.tolist()
-elif opcion_lateral == "Modelado":
-    st.title("🤖 Modelado de Datos")
-    if 'data' in st.session_state:
-        data = st.session_state.data.copy()  
-        categorical_cols = data.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
-        st.subheader("🔄 Preprocesamiento para el Modelado")
-        # Codifica variables categóricas con LabelEncoder
-        le = LabelEncoder()
-        for col in categorical_cols:
-            data[col] = le.fit_transform(data[col].astype(str))
-        # Dividir características y etiqueta
-        y = data['Outcome']
-        # Eliminar columnas que no son características
-        columns_drops = ['Outcome','Fasting_Blood_Glucose', 'HbA1c', 'Cholesterol_Total', 'Cholesterol_HDL', 'Cholesterol_LDL', 'GGT', 'Serum_Urate', 
-                       'Dietary_Intake_Calories']
-        X = data.drop(columns=columns_drops, axis=1)
-
-        # Crear el modelo XGBoost
-        model = xgb.XGBClassifier(use_label_encoder=False, eval_metric='logloss')
-
-        # División de datos
-        X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.20, random_state=42)
-        X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.50, random_state=42)
-
-        # Escalado
-        scaler = StandardScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_val_scaled = scaler.transform(X_val)
-        X_test_scaled = scaler.transform(X_test)
-
-        # Entrenar modelo
-        model.fit(X_train_scaled, y_train)
-
-        # Evaluar en validación
-        y_val_pred = model.predict(X_val_scaled)
-        st.subheader("🔍 Resultados en VALIDACIÓN (10%)")
-        st.write(f"Accuracy: {model.score(X_val_scaled, y_val) * 100:.2f}%")
-        st.text(classification_report(y_val, y_val_pred))
-
-        # Evaluar en test
-        y_test_pred = model.predict(X_test_scaled)
-        st.subheader("🧪 Resultados en TEST (10%)")
-        st.write(f"Accuracy: {model.score(X_test_scaled, y_test) * 100:.2f}%")
-        st.text(classification_report(y_test, y_test_pred))      
-        # Validación cruzada en todo el dataset escalado
-        X_all_scaled = scaler.fit_transform(X)
-        acc_scores = cross_val_score(model, X_all_scaled, y, cv=5)
-        st.subheader("🔁 Validación Cruzada")
-        st.write(f"Accuracy Promedio: {np.mean(acc_scores) * 100:.2f}%")
-        # matriz de confusión
-        
-        st.subheader("📊 Matriz de Confusión")
-        ConfusionMatrixDisplay.from_estimator(model, X_val_scaled, y_val)
-        plt.title("Matriz de Confusión en el set de validación")
-        plt.show()
-
-        f1_scores = cross_val_score(model, X_all_scaled, y, cv=5, scoring='f1_macro')
-        st.write(f"F1 Macro Score Promedio: {np.mean(f1_scores):.4f}")
-        joblib.dump(model, 'xgb_model.pkl')
-        joblib.dump(scaler, 'scaler.pkl')
-        joblib.dump(le, 'label_encoder.pkl')
-
-    else:
-        st.warning("⚠️ Primero debes cargar los datos en la sección 'Carga de Datos'.")
-    scaler = joblib.load("scaler.pkl")
-    ohe = joblib.load("label_encoder.pkl")
