@@ -57,82 +57,96 @@ def asegurar_tabla():
         except Exception as e:
             st.error(f"❌ Error al crear/verificar la tabla: {e}")
 # Mostrar registros guardados desde la base de datos (después de predicción)
+import seaborn as sns
+import matplotlib.pyplot as plt
+import pandas as pd
+
 def mostrar_registros_guardados():
     try:
         conn = conectar_db()
         df = pd.read_sql("SELECT * FROM formulario_respuestas ORDER BY id DESC", conn)
+        
         st.subheader("📌 Vista previa de los datos")
-        columns_drops = ["peso", "altura"]  # Columnas que no queremos mostrar
-        df= df.drop(columns=columns_drops)  # Eliminar columnas no relevantes
-        st.dataframe(df.head(10))  # Mostrar solo las primeras 10 filas
+        columns_drops = ["peso", "altura"]
+        df = df.drop(columns=columns_drops, errors='ignore')  # Evita error si no existen
+        st.dataframe(df.head(10))
+
         st.subheader("🔍 Información del DataFrame")
         st.write("Número de filas:", df.shape[0])
         st.write("Número de columnas:", df.shape[1])
-        # Mostrar encabezados y tipos de datos
+
         st.subheader("Encabezados")
-        st.write(df.columns)
-        # Mostrar tipos de datos y estadísticas generales
+        st.write(df.columns.tolist())
+
         st.subheader("Tipos de datos")
         st.write(df.dtypes)
-        st.subheader("Estadisticas Generales")
+
+        st.subheader("Estadísticas Generales")
         st.write(df.describe())
-        # Visualización de datos
-        st.subheader("📊 Visualización de Datos")
+
+        # Crear columna de grupo de edad
         bins = [0, 19, 29, 39, 49, 59, 69, 79, float('inf')]
         labels = ['-20', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80+']
-        df['age group'] = pd.cut(df['age'], bins=bins, labels=labels, right=True)
-        numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-        categorical_cols = df.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
-        # Agrupar por rango de edad y calcular proporción de diabetes
+        df['age_group'] = pd.cut(df['age'], bins=bins, labels=labels, right=True)
+
         # Gráfico de conteo por grupo de edad
-        plt.figure(figsize=(8, 5))
-        sns.countplot(x='age_group', data=df, palette='Blues_d')
-        plt.title("Distribución de registros por grupo de edad", fontsize=14)
-        plt.xlabel("Grupo de Edad")
-        plt.ylabel("Cantidad")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.show()
-        # graficos 
-        age_group_diabetes = df.groupby('age group')['outcome'].mean().reset_index()
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.lineplot(x='age group', y='outcome', data=age_group_diabetes, marker='o', ax=ax)
-        ax.set_title('Diabetes Rangos por Grupo de Edad')
-        ax.set_xlabel('Grupo de Edad')
-        ax.set_ylabel('Proporción con Diabetes')
-        ax.set_ylim(0, 1)
-        ax.grid(True)
-        st.pyplot(fig)
-        # Casos de Diabetes
-        st.subheader("📊 Grafico de Casos de Diabetes")
-        fig, ax = plt.subplots()
-        sns.countplot(x='outcome', data=df, ax=ax)
-        ax.set_title("Casos de diabetes")
-        ax.set_xlabel("Outcome (0 = No Diabetes, 1 = Diabetes)")
-        ax.set_ylabel("Frecuencia")
-        ax.grid(True)
-        st.pyplot(fig)
-        # Relacion entre BMi y Outcome
-        st.subheader("📊 Relación entre BMI y Outcome")
-        fig, ax = plt.subplots(figsize=(8, 6))
-        sns.boxplot(x='outcome', y='bmi', data=df, palette='Set2', ax=ax)
-        ax.set_title('Relación entre BMI y Diabetes')
-        ax.set_xlabel('Diabetes (0 = No, 1 = Sí)')
-        ax.set_ylabel('BMI')
-        ax.grid(True)
-        st.pyplot(fig)
-        # Relacion entre Edad y Outcome
-        st.subheader("📊 Relación entre Edad y Outcome")
-        fig, ax = plt.subplots(figsize=(8, 6))
-        sns.boxplot(x='outcome', y='age', data=df, palette='Set2', ax=ax)
-        ax.set_title('Relación entre Edad y Diabetes')
-        ax.set_xlabel('Diabetes (0 = No, 1 = Sí)')
-        ax.set_ylabel('Edad')
-        ax.grid(True)
-        st.pyplot(fig)
+        st.subheader("📊 Distribución por grupo de edad")
+        fig1, ax1 = plt.subplots(figsize=(8, 5))
+        sns.countplot(x='age_group', data=df, palette='Blues_d', ax=ax1)
+        ax1.set_title("Distribución de registros por grupo de edad", fontsize=14)
+        ax1.set_xlabel("Grupo de Edad")
+        ax1.set_ylabel("Cantidad")
+        ax1.tick_params(axis='x', rotation=45)
+        ax1.grid(True)
+        st.pyplot(fig1)
+
+        # Proporción de diabetes por grupo de edad
+        age_group_diabetes = df.groupby('age_group')['outcome'].mean().reset_index()
+        st.subheader("📊 Porcentaje de diabetes por grupo de edad")
+        fig2, ax2 = plt.subplots(figsize=(10, 6))
+        sns.lineplot(x='age_group', y='outcome', data=age_group_diabetes, marker='o', ax=ax2)
+        ax2.set_title('Proporción de casos de diabetes por grupo de edad')
+        ax2.set_xlabel('Grupo de Edad')
+        ax2.set_ylabel('Proporción con Diabetes')
+        ax2.set_ylim(0, 1)
+        ax2.grid(True)
+        st.pyplot(fig2)
+
+        # Casos de diabetes
+        st.subheader("📊 Frecuencia de casos de diabetes")
+        fig3, ax3 = plt.subplots()
+        sns.countplot(x='outcome', data=df, ax=ax3)
+        ax3.set_title("Casos de diabetes")
+        ax3.set_xlabel("Outcome (0 = No Diabetes, 1 = Diabetes)")
+        ax3.set_ylabel("Frecuencia")
+        ax3.grid(True)
+        st.pyplot(fig3)
+
+        # Relación entre BMI y Outcome
+        st.subheader("📊 Relación entre BMI y Diabetes")
+        fig4, ax4 = plt.subplots(figsize=(8, 6))
+        sns.boxplot(x='outcome', y='bmi', data=df, palette='Set2', ax=ax4)
+        ax4.set_title('Relación entre BMI y Diabetes')
+        ax4.set_xlabel('Diabetes (0 = No, 1 = Sí)')
+        ax4.set_ylabel('BMI')
+        ax4.grid(True)
+        st.pyplot(fig4)
+
+        # Relación entre Edad y Outcome
+        st.subheader("📊 Relación entre Edad y Diabetes")
+        fig5, ax5 = plt.subplots(figsize=(8, 6))
+        sns.boxplot(x='outcome', y='age', data=df, palette='Set2', ax=ax5)
+        ax5.set_title('Relación entre Edad y Diabetes')
+        ax5.set_xlabel('Diabetes (0 = No, 1 = Sí)')
+        ax5.set_ylabel('Edad')
+        ax5.grid(True)
+        st.pyplot(fig5)
+
         conn.close()
+
     except Exception as e:
         st.error(f"❌ Error al cargar registros: {e}")
+
 
 
 # --- Guardar datos del formulario en la base de datos 
