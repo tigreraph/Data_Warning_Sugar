@@ -458,12 +458,12 @@ if opcion_lateral == "Formulario":
             st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
             mostrar_recomendacion_riesgo(st.session_state["proba"])
             mostrar_factores_modificables(st.session_state.form_data)
-            mostrar_creditos_proyecto()
 
         # Mostrar botón SIEMPRE que ya se haya predicho
         if "prediccion_realizada" in st.session_state:
             if st.button("📋 Ver análisis de registros guardados"):
                 mostrar_registros_guardados()
+                mostrar_creditos_proyecto() 
     # Continuar con preguntas paso a paso
 if isinstance(st.session_state.get("step"), int):
     paso = st.session_state.step
