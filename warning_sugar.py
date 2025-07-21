@@ -143,7 +143,6 @@ def mostrar_registros_guardados():
         st.pyplot(fig5)
 
         conn.close()
-
     except Exception as e:
         st.error(f"❌ Error al cargar registros: {e}")
 
@@ -249,6 +248,60 @@ def mostrar_factores_modificables(datos):
 
     if cintura < 90 and imc < 25 and pas < 130 and pad < 85:
         st.success("🎉 ¡Excelente! Eres una persona saludable.")
+def mostrar_creditos_proyecto():
+    st.markdown("---")
+    st.header("🔬 Acerca del Proyecto WarningSugar")
+
+    resumen = (
+        "WarningSugar es una solución innovadora que busca prevenir la diabetes en adultos jóvenes "
+        "de 20 a 25 años, utilizando tecnologías avanzadas de Big Data y Machine Learning. Nuestro "
+        "proyecto combina análisis de datos clínicos, algoritmos predictivos y visualización interactiva "
+        "para ofrecer una herramienta accesible y útil tanto para profesionales de la salud como para la población en general."
+    )
+    st.write(resumen)
+
+    st.header("🎯 Objetivo")
+    st.write(
+        "Prevenir la tendencia a la diabetes en adultos jóvenes en el rango de edad de 20 a 25 años a través "
+        "del análisis de casos recientes, exámenes de sangre y modelo predictivo para mostrar mediante una interfaz web los resultados y recomendaciones."
+    )
+
+    st.header("📊 Descripción del Dataset")
+    try:
+        descripcion_variables = pd.read_csv("csv/descripcion_variables.csv")
+        st.dataframe(descripcion_variables)
+    except Exception as e:
+        st.error(f"No se pudo cargar el archivo CSV: {e}")
+
+    st.markdown("📁 [Link al Dataset en Kaggle](https://www.kaggle.com/datasets/marshalpatel3558/diabetes-prediction-dataset)")
+
+    st.markdown("## 👥 Integrantes")
+    integrantes = [
+        {
+            "nombre": "Diego Josue Mendez Peralta",
+            "correo": "diego.mendez.est@tecazuay.edu.ec",
+            "genero": "Masculino",
+            "edad": 19,
+            "aporte": "Análisis de datos"
+        },
+        {
+            "nombre": "Jonnathan Fernando Tigre Bueno",
+            "correo": "jonnathanf.tigre.est@tecazuay.edu.ec",
+            "genero": "Masculino",
+            "edad": 28,
+            "aporte": "Creación de la interfaz web y modelo predictivo"
+        }
+    ]
+
+    cols = st.columns(len(integrantes))
+    for i, integrante in enumerate(integrantes):
+        with cols[i]:
+            st.markdown("----")
+            st.markdown(f"**👤 Nombre:** {integrante['nombre']}")
+            st.markdown(f"📧 **Correo:** {integrante['correo']}")
+            st.markdown(f"⚧️ **Género:** {integrante['genero']}")
+            st.markdown(f"🎂 **Edad:** {integrante['edad']}")
+            st.markdown(f"💡 **Aporte:** {integrante['aporte']}")
 
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
@@ -405,6 +458,7 @@ if opcion_lateral == "Formulario":
             st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
             mostrar_recomendacion_riesgo(st.session_state["proba"])
             mostrar_factores_modificables(st.session_state.form_data)
+            mostrar_creditos_proyecto()
 
         # Mostrar botón SIEMPRE que ya se haya predicho
         if "prediccion_realizada" in st.session_state:
@@ -524,21 +578,14 @@ if opcion_lateral == "Presentación":
             "correo": "diego.mendez.est@tecazuay.edu.ec",
             "genero": "Masculino",
             "edad": 19,
-            "aporte": "Creación de la página web."
-        },
-        {
-            "nombre": "Maria José Peña Carrera",
-            "correo": "maria.pena.est@tecazuay.edu.ec",
-            "genero": "Femenino",
-            "edad": 32,
-            "aporte": "Modelado de las gráficas."
+            "aporte": "Analisis de datos"
         },
         {
             "nombre": "Jonnathan Fernando Tigre Bueno",
             "correo": "jonnathanf.tigre.est@tecazuay.edu.ec",
             "genero": "Masculino",
             "edad": 28,
-            "aporte": "Análisis de datos."
+            "aporte": "Creación de la interfaz web y modelo predictivo"
         }
     ]
     # Distribuir en filas de 3 columnas máximo por fila (puedes ajustar según el diseño)
