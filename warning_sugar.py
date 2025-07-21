@@ -84,12 +84,16 @@ def mostrar_registros_guardados():
         numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
         categorical_cols = df.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
         # Agrupar por rango de edad y calcular proporción de diabetes
-        sns.countplot(x='age group', data=df)
-        plt.title(f"Chart for age group")
+        # Gráfico de conteo por grupo de edad
+        plt.figure(figsize=(8, 5))
+        sns.countplot(x='age_group', data=df, palette='Blues_d')
+        plt.title("Distribución de registros por grupo de edad", fontsize=14)
+        plt.xlabel("Grupo de Edad")
+        plt.ylabel("Cantidad")
         plt.xticks(rotation=45)
-        plt.legend()
         plt.tight_layout()
         plt.show()
+        # graficos 
         age_group_diabetes = df.groupby('age group')['outcome'].mean().reset_index()
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.lineplot(x='age group', y='outcome', data=age_group_diabetes, marker='o', ax=ax)
