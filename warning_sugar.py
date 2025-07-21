@@ -86,7 +86,6 @@ def mostrar_registros_guardados():
 
         # Agrupar por rango de edad y calcular proporción de diabetes
         age_group_diabetes = df.groupby('age group')['outcome'].mean().reset_index()
-        # Graficar
         fig, ax = plt.subplots(figsize=(10, 6))
         sns.lineplot(x='age group', y='outcome', data=age_group_diabetes, marker='o', ax=ax)
         ax.set_title('Diabetes Rate by Age Group')
@@ -99,7 +98,7 @@ def mostrar_registros_guardados():
         st.subheader("📊 Clase Objetivo ")
         fig, ax = plt.subplots()
         sns.countplot(x='outcome', data=df, ax=ax)
-        ax.set_title("Distribución de la Clase Objetivo (Outcome)")
+        ax.set_title("Casos de diabetes")
         ax.set_xlabel("Outcome (0 = No Diabetes, 1 = Diabetes)")
         ax.set_ylabel("Frecuencia")
         ax.grid(True)
