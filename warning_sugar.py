@@ -442,7 +442,7 @@ if opcion_lateral == "Formulario":
                     st.error(f"❌ Error al guardar en la base de datos: {e}")
                 # Mostrar resultados
                 mostrar_categoria_riesgo(proba)
-                st.subheader(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
+                st.write(f"📊 El Resultado de la predicción: {proba * 100:.2f}%")
                 mostrar_recomendacion_riesgo(proba)
                 mostrar_factores_modificables(st.session_state.form_data)
                 # Guardar la probabilidad en session_state
