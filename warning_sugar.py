@@ -250,8 +250,7 @@ def mostrar_creditos_proyecto():
     st.header("🔬 Acerca del Proyecto WarningSugar")
 
     resumen = (
-        "WarningSugar es una solución innovadora que busca prevenir la diabetes en adultos jóvenes "
-        "de 20 a 25 años, utilizando tecnologías avanzadas de Big Data y Machine Learning. Nuestro "
+        "WarningSugar es una solución innovadora que busca prevenir la diabetes en personas, utilizando tecnologías avanzadas de Big Data y Machine Learning. Nuestro "
         "proyecto combina análisis de datos clínicos, algoritmos predictivos y visualización interactiva "
         "para ofrecer una herramienta accesible y útil tanto para profesionales de la salud como para la población en general."
     )
@@ -259,7 +258,7 @@ def mostrar_creditos_proyecto():
 
     st.header("🎯 Objetivo")
     st.write(
-        "Prevenir la tendencia a la diabetes en adultos jóvenes en el rango de edad de 20 a 25 años a través "
+        "Prevenir la tendencia a la diabetes en adultos a través "
         "del análisis de casos recientes, exámenes de sangre y modelo predictivo para mostrar mediante una interfaz web los resultados y recomendaciones."
     )
 
