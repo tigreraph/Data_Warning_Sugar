@@ -303,7 +303,7 @@ def mostrar_creditos_proyecto():
 # Título de la aplicación
 imagen_encabezado = Image.open("images/logo.png")  
 st.image(imagen_encabezado)
-st.title(" Tecnología Superior en Big Data.")
+st.title(" Tecnología Superior en Big Data")
 st.title("🩺 WarningSugar: Predicción Temprana de Diabetes")
 # Menú lateral
 ##opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
