@@ -452,7 +452,7 @@ if opcion_lateral == "Formulario":
         else:
             # Mostrar resultado anterior sin volver a ejecutar la predicción
             mostrar_categoria_riesgo(st.session_state["proba"])
-            st.subheader(f"📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
+            st.subheader(f"\n 📊 El Resultado de la predicción: {st.session_state['proba'] * 100:.2f}%")
             mostrar_recomendacion_riesgo(st.session_state["proba"])
             mostrar_factores_modificables(st.session_state.form_data)
 
