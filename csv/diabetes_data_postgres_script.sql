@@ -1,19 +1,22 @@
 DROP TABLE IF EXISTS diabetes_data;
 
 CREATE TABLE diabetes_data (
+"id" SERIAL PRIMARY KEY,
 "age" INTEGER,
-"sex" VARCHAR(255),
-"ethnicity" VARCHAR(255),
+"sex" VARCHAR(50),
+"ethnicity" VARCHAR(50),
+"peso" FLOAT,
+"altura' FLOAT,
 "bmi" FLOAT,
 "waist_circumference" FLOAT,
-"blood_pressure_systolic" INTEGER,
-"blood_pressure_diastolic" INTEGER,
-"physical_activity_level" VARCHAR(255),
-"alcohol_consumption" VARCHAR(255),
-"smoking_status" VARCHAR(255),
-"family_history_of_diabetes" INTEGER,
-"previous_gestational_diabetes" INTEGER,
-"outcome" INTEGER
+"blood_pressure_systolic" FLOAT,
+"blood_pressure_diastolic" FLOAT,
+"physical_activity_level" VARCHAR(50),
+"alcohol_consumption" VARCHAR(50),
+"smoking_status" VARCHAR(50),
+"family_history_of_diabetes" BOOLEAN,
+"previous_gestational_diabetes" BOOLEAN,
+'outcome" INTEGER
 );
 
 INSERT INTO diabetes_data ("age", "sex", "ethnicity", "bmi", "waist_circumference", "blood_pressure_systolic", "blood_pressure_diastolic", "physical_activity_level", "alcohol_consumption", "smoking_status", "family_history_of_diabetes", "previous_gestational_diabetes", "outcome") VALUES (58, 'Female', 'White', 35.8, 83.4, 152, 114, 'Moderate', 'Moderate', 'Never', 0, 1, 1);
