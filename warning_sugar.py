@@ -143,8 +143,6 @@ def mostrar_registros_guardados():
     except Exception as e:
         st.error(f"❌ Error al cargar registros: {e}")
 
-
-
 # --- Guardar datos del formulario en la base de datos 
 def guardar_en_base_de_datos(form_data,outcome):
     asegurar_tabla()
