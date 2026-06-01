@@ -1,3 +1,5 @@
+from click import option
+from openpyxl import load_workbook
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -55,6 +57,7 @@ def asegurar_tabla():
         except Exception as e:
             st.error(f"❌ Error al crear/verificar la tabla: {e}")
 # Mostrar registros guardados desde la base de datos (después de predicción)
+
 def mostrar_registros_guardados():
     try:
         conn = conectar_db()
@@ -297,7 +300,11 @@ st.image(imagen_encabezado)
 st.title(" Tecnología Superior en Big Data")
 st.title("🩺 WarningSugar: Predicción Temprana de Diabetes")
 # Menú lateral
-opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario', "Presentación", "Carga de Datos", "Pre procesamiento", "Visualizacion", "Modelado"])
+##opcion_lateral = st.sidebar.selectbox("Navegación", ['Formulario',"Presentación", "Carga de Datos", "Pre procesamiento","Visualizacion", "Modelado"])
+#Formulario 
+
+# Contenido según la opción seleccionada
+opcion_lateral = "Formulario"
 if opcion_lateral == "Formulario":
     if "step" not in st.session_state:
         st.session_state.step = 0
@@ -451,100 +458,100 @@ if opcion_lateral == "Formulario":
                 mostrar_registros_guardados()
                 mostrar_creditos_proyecto() 
     # Continuar con preguntas paso a paso
-    if isinstance(st.session_state.get("step"), int):
-        paso = st.session_state.step
-        clave, tipo, kwargs, ruta_imagen = preguntas[paso]
+if isinstance(st.session_state.get("step"), int):
+    paso = st.session_state.step
+    clave, tipo, kwargs, ruta_imagen = preguntas[paso]
 
-        # Barra tipo wizard
-        barra = ""
-        for i in range(total_pasos):
-            color = "#0047AB" if i == paso else "#ccc"
-            texto = f"<span style='background:{color};color:white;border-radius:50%;padding:6px 12px;margin:3px'>{i+1}</span>"
-            barra += texto
-        st.markdown(f"<div style='text-align:center;font-size:20px'>{barra}</div>", unsafe_allow_html=True)
-        st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+    # Barra tipo wizard
+    barra = ""
+    for i in range(total_pasos):
+        color = "#0047AB" if i == paso else "#ccc"
+        texto = f"<span style='background:{color};color:white;border-radius:50%;padding:6px 12px;margin:3px'>{i+1}</span>"
+        barra += texto
+    st.markdown(f"<div style='text-align:center;font-size:20px'>{barra}</div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
 
-        col_txt, col_img = st.columns([2, 1])
-        with col_txt:
-            st.markdown(f"<div class='pregunta-formulario'>{kwargs['label']}</div>", unsafe_allow_html=True)
+    col_txt, col_img = st.columns([2, 1])
+    with col_txt:
+        st.markdown(f"<div class='pregunta-formulario'>{kwargs['label']}</div>", unsafe_allow_html=True)
 
-            if tipo == "number":
-                with st.form(key=f"form_{clave}"):
-                    valor_actual = st.session_state.form_data.get(clave, kwargs.get("min_value", 0))
-                    respuesta = st.number_input(label="", value=valor_actual, **{k: v for k, v in kwargs.items() if k not in ["label", "value"]})
+        if tipo == "number":
+            with st.form(key=f"form_{clave}"):
+                valor_actual = st.session_state.form_data.get(clave, kwargs.get("min_value", 0))
+                respuesta = st.number_input(label="", value=valor_actual, **{k: v for k, v in kwargs.items() if k not in ["label", "value"]})
 
-                    col1, col2 = st.columns([1, 1])
-                    with col1:
-                        btn_prev = st.form_submit_button("⬅️ Anterior")
-                    with col2:
-                        if paso < total_pasos - 1:
-                            btn_next = st.form_submit_button("Siguiente ➡️")
-                        else:
-                            btn_next = st.form_submit_button("✅ Finalizar")
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    btn_prev = st.form_submit_button("⬅️ Anterior")
+                with col2:
+                    if paso < total_pasos - 1:
+                        btn_next = st.form_submit_button("Siguiente ➡️")
+                    else:
+                        btn_next = st.form_submit_button("✅ Finalizar")
 
-                    if btn_prev and paso > 0:
-                        st.session_state.form_data[clave] = respuesta
-                        prev_step()
-                        st.rerun()
-
-                    if btn_next:
-                        st.session_state.form_data[clave] = respuesta
-                        if paso < total_pasos - 1:
-                            next_step()
-                        else:
-                            st.session_state.step = "resumen"
-                        st.rerun()
-
-            elif tipo == "select":
-                opciones = kwargs["options"]
-                cols = st.columns(3)
-                for i, opcion in enumerate(opciones):
-                    with cols[i % 3]:
-                        if st.button(opcion, key=f"{clave}_{i}"):
-                            st.session_state.form_data[clave] = opcion
-                            if paso < total_pasos - 1:
-                                next_step()
-                                st.rerun()
-                            else:
-                                st.session_state.step = "resumen"
-                                st.rerun()
-
-            elif tipo == "peso_altura":
-                # Validación para el formulario de peso y altura
-                peso = st.number_input("⚖️ Peso (kg)", min_value=0.01, format="%.2f")
-                altura = st.number_input("📏 Altura (cm)", min_value=0.01, format="%.2f")
-
-                # Calcular IMC si ambos valores son mayores a cero
-                if peso > 0 and altura > 0:
-                    altura_m = altura / 100  # Convertir altura a metros
-                    imc = peso / (altura_m ** 2)  # Fórmula para calcular el IMC
-                    st.markdown(f"### 💡 Tu IMC es: `{imc:.2f}`")  # Mostrar IMC calculado
-
-                # Validación: Si el usuario ingresa valores negativos o cero, mostrar advertencia
-                if peso <= 0 or altura <= 0:
-                    st.warning("⚠️ Los valores de peso y altura deben ser positivos y mayores que cero.")
-
-                # Botón para pasar al siguiente paso
-                btn_next = st.button("Siguiente ➡️")
+                if btn_prev and paso > 0:
+                    st.session_state.form_data[clave] = respuesta
+                    prev_step()
+                    st.rerun()
 
                 if btn_next:
-                    # Si los valores son válidos, se guarda la información
-                    if peso > 0 and altura > 0:
-                        st.session_state.form_data["Peso"] = peso
-                        st.session_state.form_data["Altura"] = altura
-                        st.session_state.form_data["BMI"] = round(imc, 2)  # Guardamos el IMC calculado
+                    st.session_state.form_data[clave] = respuesta
+                    if paso < total_pasos - 1:
                         next_step()
-                        st.rerun()
                     else:
-                        st.warning("⚠️ Completa correctamente los campos de peso y altura antes de continuar.")
+                        st.session_state.step = "resumen"
+                    st.rerun()
 
-        with col_img:
-            try:
-                st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
-                st.image(ruta_imagen, width=220)
-                st.markdown("</div>", unsafe_allow_html=True)
-            except:
-                st.info("Imagen no disponible.")
+        elif tipo == "select":
+            opciones = kwargs["options"]
+            cols = st.columns(3)
+            for i, opcion in enumerate(opciones):
+                with cols[i % 3]:
+                    if st.button(opcion, key=f"{clave}_{i}"):
+                        st.session_state.form_data[clave] = opcion
+                        if paso < total_pasos - 1:
+                            next_step()
+                            st.rerun()
+                        else:
+                            st.session_state.step = "resumen"
+                            st.rerun()
+
+        elif tipo == "peso_altura":
+            # Validación para el formulario de peso y altura
+            peso = st.number_input("⚖️ Peso (kg)", min_value=0.01, format="%.2f")
+            altura = st.number_input("📏 Altura (cm)", min_value=0.01, format="%.2f")
+
+            # Calcular IMC si ambos valores son mayores a cero
+            if peso > 0 and altura > 0:
+                altura_m = altura / 100  # Convertir altura a metros
+                imc = peso / (altura_m ** 2)  # Fórmula para calcular el IMC
+                st.markdown(f"### 💡 Tu IMC es: `{imc:.2f}`")  # Mostrar IMC calculado
+
+            # Validación: Si el usuario ingresa valores negativos o cero, mostrar advertencia
+            if peso <= 0 or altura <= 0:
+                st.warning("⚠️ Los valores de peso y altura deben ser positivos y mayores que cero.")
+
+            # Botón para pasar al siguiente paso
+            btn_next = st.button("Siguiente ➡️")
+
+            if btn_next:
+                # Si los valores son válidos, se guarda la información
+                if peso > 0 and altura > 0:
+                    st.session_state.form_data["Peso"] = peso
+                    st.session_state.form_data["Altura"] = altura
+                    st.session_state.form_data["BMI"] = round(imc, 2)  # Guardamos el IMC calculado
+                    next_step()
+                    st.rerun()
+                else:
+                    st.warning("⚠️ Completa correctamente los campos de peso y altura antes de continuar.")
+
+    with col_img:
+        try:
+            st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
+            st.image(ruta_imagen, width=220)
+            st.markdown("</div>", unsafe_allow_html=True)
+        except:
+            st.info("Imagen no disponible.")
 
 #Presentación
 
@@ -557,7 +564,7 @@ elif opcion_lateral == "Pre procesamiento":
         st.subheader("⌛ Remplazando Valores Vacios")
         # remplazo de valores por la moda en la columna de consumo de alcohol
         most_common = data['Alcohol_Consumption'].mode()[0]
-        data['Alcohol_Consumption'] = data['Alcohol_Consumption'].fillna(most_common)
+        data['Alcohol_Consumption'].fillna(most_common, inplace=True)
         st.write("Alcohol_Consumption reemplazados por la moda:", most_common)
         # visualizacion de los datos cambiados
         st.write(data['Alcohol_Consumption'].head())
